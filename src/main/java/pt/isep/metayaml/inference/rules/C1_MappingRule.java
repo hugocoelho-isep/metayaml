@@ -39,8 +39,8 @@ public class C1_MappingRule implements ICreationRule {
 
         // add or update reference on the owner
         owner.findReference(key).ifPresentOrElse(
-                existing -> existing.setOptional(true),
-                () -> owner.addReference(new MetaReference(key, target, false, false, false))
+                existing -> existing.incrementOccurrences(),
+                () -> owner.addReference(new MetaReference(key, target, true, false, false))
         );
 
         // recurse into the nested mapping

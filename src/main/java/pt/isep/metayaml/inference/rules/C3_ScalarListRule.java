@@ -39,7 +39,7 @@ public class C3_ScalarListRule implements ICreationRule{
                 .orElse(DataType.UNKNOWN);
 
         owner.findAttribute(key).ifPresentOrElse(
-                existing -> existing.setOptional(true),
+                existing -> existing.incrementOccurrences(),
                 () -> owner.addAttribute(new MetaAttribute(key, type, false, true))
         );
     }

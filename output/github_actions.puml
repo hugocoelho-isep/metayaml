@@ -7,11 +7,15 @@ class GithubActions{
   + name : STRING [1..1]
 }
 
-class Jobs{
+class On{
 }
 
-class Build{
-  + runs-on : STRING [1..1]
+class Push{
+  + branches : STRING [0..*]
+  + tags : STRING [0..*]
+}
+
+class Jobs{
 }
 
 class Step{
@@ -29,18 +33,6 @@ class With{
   + generate_release_notes : BOOLEAN [0..1]
 }
 
-class On{
-}
-
-class Push{
-  + branches : STRING [0..*]
-  + tags : STRING [0..*]
-}
-
-class Pull_request{
-  + branches : STRING [0..*]
-}
-
 class Release{
   + runs-on : STRING [1..1]
 }
@@ -49,16 +41,15 @@ class Permissions{
   + contents : STRING [1..1]
 }
 
-GithubActions --> "0..1" Jobs : jobs
-GithubActions --> "0..1" On : on
-Jobs --> "0..1" Build : build
-Jobs --> "0..1" Build : lint
-Jobs --> "0..1" Release : release
-Build *--> [0..*] Step : steps
-Step --> "0..1" With : with
-On --> "0..1" Push : push
-On --> "0..1" Pull_request : pull_request
-Release --> "1..1" Permissions : permissions
+GithubActions *--> "1..1" On : on
+GithubActions *--> "1..1" Jobs : jobs
+On *--> "0..1" Push : push
+On *--> "0..1" Push : pull_request
+Jobs *--> "0..1" Release : build
+Jobs *--> "0..1" Release : lint
+Jobs *--> "0..1" Release : release
+Step *--> "0..1" With : with
+Release *--> "0..1" Permissions : permissions
 Release *--> [0..*] Step : steps
 
 @enduml

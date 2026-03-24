@@ -39,7 +39,11 @@ public class R3_ClassMergeRule implements IRefinementRule {
                 MetaClass metaClassB = classes.get(j);
 
                 if (arcMergeable(metaClassA, metaClassB)){
-                    merge(metaClassA, metaClassB,metamodel);
+                    // survivor is the class with more features
+                    boolean aSubsetOfB = isSubset(metaClassA, metaClassB);
+                    MetaClass survivor = aSubsetOfB ? metaClassB : metaClassA;
+                    MetaClass absorbed = aSubsetOfB ? metaClassA : metaClassB;
+                    merge(survivor, absorbed, metamodel);
                     return true;
                 }
             }
@@ -53,13 +57,20 @@ public class R3_ClassMergeRule implements IRefinementRule {
         Set<String> refA = referenceNames(metaClassA);
         Set<String> refB = referenceNames(metaClassB);
 
-        // need at least one shared feature
+        // both must have at least one feature
         if(attrsA.isEmpty() && refA.isEmpty())
             return false;
         if(attrsB.isEmpty() && refB.isEmpty())
-            return true;
+            return false;
 
-        return attrsA.equals(attrsB) && refA.equals(refB);
+        // mergeable if structurally equal or one is a subset of the other
+        return isSubset(metaClassA, metaClassB) || isSubset(metaClassB, metaClassA);
+    }
+
+    /** Returns true if all features of A are present in B (A ⊆ B). */
+    private boolean isSubset(MetaClass a, MetaClass b) {
+        return attributeNames(b).containsAll(attributeNames(a))
+                && referenceNames(b).containsAll(referenceNames(a));
     }
 
     private void merge(MetaClass survivor, MetaClass absorbed, InferredMetamodel metamodel){
@@ -76,6 +87,22 @@ public class R3_ClassMergeRule implements IRefinementRule {
             if(survivor.findAttribute(attr.getName()).isEmpty()){
                 attr.setOptional(true);
                 survivor.addAttribute(attr);
+            }
+        });
+
+        // reference in survivor but not in absorbed -> optional
+        Set<String> absorbedRefNames = referenceNames(absorbed);
+        survivor.getReferences().forEach(ref -> {
+            if(!absorbedRefNames.contains(ref.getName())){
+                ref.setOptional(true);
+            }
+        });
+
+        // reference in absorbed but not in survivor -> add as optional
+        absorbed.getReferences().forEach(ref -> {
+            if(survivor.findReference(ref.getName()).isEmpty()){
+                ref.setOptional(true);
+                survivor.addReference(ref);
             }
         });
 
