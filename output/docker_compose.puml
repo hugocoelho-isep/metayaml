@@ -1,0 +1,81 @@
+@startuml docker_compose
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+
+class DockerCompose{
+  + version : STRING [1..1]
+}
+
+class Services{
+}
+
+class Prometheus{
+  + image : STRING [1..1]
+  + ports : STRING [0..*]
+  + volumes : STRING [0..*]
+  + restart : STRING [1..1]
+}
+
+class Grafana{
+  + image : STRING [1..1]
+  + ports : STRING [0..*]
+  + environment : STRING [0..*]
+  + volumes : STRING [0..*]
+  + depends_on : STRING [0..*]
+  + restart : STRING [1..1]
+}
+
+class Volumes{
+  + prometheus-data : STRING [0..1]
+  + grafana-data : STRING [0..1]
+  + db-data : STRING [0..1]
+}
+
+class App{
+  + image : STRING [1..1]
+  + ports : STRING [0..*]
+  + environment : STRING [0..*]
+  + restart : STRING [1..1]
+}
+
+class Build{
+  + context : STRING [1..1]
+  + dockerfile : STRING [1..1]
+}
+
+class Depends_on{
+}
+
+class Db{
+  + condition : STRING [0..1]
+  + image : STRING [0..1]
+  + volumes : STRING [0..*]
+}
+
+class Environment{
+  + POSTGRES_DB : STRING [1..1]
+  + POSTGRES_USER : STRING [1..1]
+  + POSTGRES_PASSWORD : STRING [1..1]
+}
+
+class Healthcheck{
+  + test : STRING [0..*]
+  + interval : STRING [1..1]
+  + timeout : STRING [1..1]
+  + retries : INTEGER [1..1]
+}
+
+DockerCompose --> "0..1" Services : services
+DockerCompose --> "0..1" Volumes : volumes
+Services --> "0..1" Prometheus : prometheus
+Services --> "0..1" Grafana : grafana
+Services --> "0..1" App : app
+Services --> "0..1" Db : db
+App --> "1..1" Build : build
+App --> "1..1" Depends_on : depends_on
+Depends_on --> "1..1" Db : db
+Db --> "0..1" Environment : environment
+Db --> "0..1" Healthcheck : healthcheck
+
+@enduml

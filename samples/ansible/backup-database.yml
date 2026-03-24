@@ -1,0 +1,42 @@
+name: Database Backup
+hosts: dbservers
+become: true
+vars:
+  backup_dir: /var/backups/postgres
+  db_name: mydb
+  db_user: admin
+  retention_days: 7
+
+tasks:
+  - name: Ensure backup directory exists
+    file:
+      path: "{{ backup_dir }}"
+      state: directory
+      owner: postgres
+      mode: '0700'
+
+  - name: Dump database
+    command: >
+      pg_dump -U {{ db_user }} {{ db_name }}
+      -f {{ backup_dir }}/{{ db_name }}_{{ ansible_date_time.date }}.sql
+    become_user: postgres
+
+  - name: Compress backup
+    archive:
+      path: "{{ backup_dir }}/{{ db_name }}_{{ ansible_date_time.date }}.sql"
+      dest: "{{ backup_dir }}/{{ db_name }}_{{ ansible_date_time.date }}.sql.gz"
+      format: gz
+      remove: true
+
+  - name: Remove old backups
+    find:
+      paths: "{{ backup_dir }}"
+      age: "{{ retention_days }}d"
+      patterns: "*.sql.gz"
+    register: old_backups
+
+  - name: Delete old backups
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    loop: "{{ old_backups.files }}"

@@ -1,0 +1,40 @@
+name: Setup Web Server
+hosts: webservers
+become: true
+vars:
+  app_port: 8080
+  app_user: deploy
+  app_dir: /opt/myapp
+
+tasks:
+  - name: Install Java 21
+    apt:
+      name: openjdk-21-jdk
+      state: present
+      update_cache: true
+
+  - name: Create application user
+    user:
+      name: "{{ app_user }}"
+      system: true
+      shell: /bin/false
+
+  - name: Create application directory
+    file:
+      path: "{{ app_dir }}"
+      state: directory
+      owner: "{{ app_user }}"
+      mode: '0755'
+
+  - name: Copy application JAR
+    copy:
+      src: target/app.jar
+      dest: "{{ app_dir }}/app.jar"
+      owner: "{{ app_user }}"
+      mode: '0644'
+
+  - name: Start application service
+    systemd:
+      name: myapp
+      state: started
+      enabled: true

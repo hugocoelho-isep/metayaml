@@ -1,0 +1,85 @@
+@startuml ansible
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+
+class Ansible{
+  + become : BOOLEAN [1..1]
+  + name : STRING [1..1]
+  + hosts : STRING [1..1]
+}
+
+class Vars{
+  + backup_dir : STRING [0..1]
+  + db_name : STRING [0..1]
+  + db_user : STRING [0..1]
+  + retention_days : INTEGER [0..1]
+  + app_port : INTEGER [0..1]
+  + app_user : STRING [0..1]
+  + app_dir : STRING [0..1]
+}
+
+class Task{
+  + name : STRING [1..1]
+  + command : STRING [0..1]
+  + become_user : STRING [0..1]
+  + register : STRING [0..1]
+  + loop : STRING [0..1]
+}
+
+class File{
+  + path : STRING [1..1]
+  + state : STRING [1..1]
+  + owner : STRING [0..1]
+  + mode : STRING [0..1]
+}
+
+class Archive{
+  + path : STRING [1..1]
+  + dest : STRING [1..1]
+  + format : STRING [1..1]
+  + remove : BOOLEAN [1..1]
+}
+
+class Find{
+  + paths : STRING [1..1]
+  + age : STRING [1..1]
+  + patterns : STRING [1..1]
+}
+
+class Apt{
+  + name : STRING [1..1]
+  + state : STRING [1..1]
+  + update_cache : BOOLEAN [1..1]
+}
+
+class User{
+  + name : STRING [1..1]
+  + system : BOOLEAN [1..1]
+  + shell : STRING [1..1]
+}
+
+class Copy{
+  + src : STRING [1..1]
+  + dest : STRING [1..1]
+  + owner : STRING [1..1]
+  + mode : STRING [1..1]
+}
+
+class Systemd{
+  + name : STRING [1..1]
+  + state : STRING [1..1]
+  + enabled : BOOLEAN [1..1]
+}
+
+Ansible --> "0..1" Vars : vars
+Ansible *--> [0..*] Task : tasks
+Task --> "0..1" File : file
+Task --> "0..1" Archive : archive
+Task --> "0..1" Find : find
+Task --> "0..1" Apt : apt
+Task --> "0..1" User : user
+Task --> "0..1" Copy : copy
+Task --> "0..1" Systemd : systemd
+
+@enduml
