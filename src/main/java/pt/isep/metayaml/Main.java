@@ -11,7 +11,6 @@ import pt.isep.metayaml.input.InputLoader;
 import pt.isep.metayaml.model.InferredMetamodel;
 import pt.isep.metayaml.model.ParsedDocument;
 
-import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
