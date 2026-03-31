@@ -63,7 +63,7 @@ public class PlantUmlExporter implements IMetamodelExporter{
 
     private String formatRelationship(MetaClass owner, MetaReference ref) {
         String multiplicity = ref.isMany()
-                ? "[0..*]"
+                ? (ref.isOptional() ? "\"0..*\"" : "\"1..*\"")
                 : (ref.isOptional() ? "\"0..1\"" : "\"1..1\"");
 
         if(ref.isContainment()){

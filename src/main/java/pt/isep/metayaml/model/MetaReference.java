@@ -58,7 +58,7 @@ public class MetaReference {
 
     @Override
     public String toString() {
-        String multiplicity  = many ? "[0..*]" : (optional ? "[0..1]" : "[1..1]");
+        String multiplicity  = many ? (optional ? "[0..*]" : "[1..*]") : (optional ? "[0..1]" : "[1..1]");
         String containMarker = containment ? " <<containment>>" : "";
         return name + " --> " + target.getName() + " " + multiplicity + containMarker;
     }

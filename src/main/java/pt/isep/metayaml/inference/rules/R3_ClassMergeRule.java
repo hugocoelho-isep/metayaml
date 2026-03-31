@@ -39,11 +39,7 @@ public class R3_ClassMergeRule implements IRefinementRule {
                 MetaClass metaClassB = classes.get(j);
 
                 if (arcMergeable(metaClassA, metaClassB)){
-                    // survivor is the class with more features
-                    boolean aSubsetOfB = isSubset(metaClassA, metaClassB);
-                    MetaClass survivor = aSubsetOfB ? metaClassB : metaClassA;
-                    MetaClass absorbed = aSubsetOfB ? metaClassA : metaClassB;
-                    merge(survivor, absorbed, metamodel);
+                    merge(metaClassA, metaClassB, metamodel);
                     return true;
                 }
             }
@@ -63,14 +59,7 @@ public class R3_ClassMergeRule implements IRefinementRule {
         if(attrsB.isEmpty() && refB.isEmpty())
             return false;
 
-        // mergeable if structurally equal or one is a subset of the other
-        return isSubset(metaClassA, metaClassB) || isSubset(metaClassB, metaClassA);
-    }
-
-    /** Returns true if all features of A are present in B (A ⊆ B). */
-    private boolean isSubset(MetaClass a, MetaClass b) {
-        return attributeNames(b).containsAll(attributeNames(a))
-                && referenceNames(b).containsAll(referenceNames(a));
+        return attrsA.equals(attrsB) && refA.equals(refB);
     }
 
     private void merge(MetaClass survivor, MetaClass absorbed, InferredMetamodel metamodel){

@@ -7,29 +7,22 @@ class DockerCompose{
   + version : STRING [1..1]
 }
 
+class Services{
+}
+
+class Service{
+  + image : STRING [1..1]
+  + ports : STRING [0..*]
+  + volumes : STRING [0..*]
+  + restart : STRING [0..1]
+  + environment : STRING [0..*]
+  + depends_on : STRING [0..*]
+}
+
 class Volumes{
   + prometheus-data : STRING [0..1]
   + grafana-data : STRING [0..1]
   + db-data : STRING [0..1]
-}
-
-class Services{
-}
-
-class Grafana{
-  + image : STRING [1..1]
-  + ports : STRING [0..*]
-  + environment : STRING [0..*]
-  + volumes : STRING [0..*]
-  + depends_on : STRING [0..*]
-  + restart : STRING [1..1]
-}
-
-class App{
-  + image : STRING [1..1]
-  + ports : STRING [0..*]
-  + environment : STRING [0..*]
-  + restart : STRING [1..1]
 }
 
 class Build{
@@ -37,10 +30,11 @@ class Build{
   + dockerfile : STRING [1..1]
 }
 
+class Depends_on{
+}
+
 class Db{
-  + condition : STRING [0..1]
-  + image : STRING [0..1]
-  + volumes : STRING [0..*]
+  + condition : STRING [1..1]
 }
 
 class Environment{
@@ -56,15 +50,13 @@ class Healthcheck{
   + retries : INTEGER [1..1]
 }
 
-DockerCompose *--> "1..1" Volumes : volumes
 DockerCompose *--> "1..1" Services : services
-Services *--> "0..1" Grafana : prometheus
-Services *--> "0..1" Grafana : grafana
-Services *--> "0..1" App : app
-Services *--> "0..1" Db : db
-App *--> "1..1" Build : build
-App *--> "1..1" Services : depends_on
-Db *--> "0..1" Environment : environment
-Db *--> "0..1" Healthcheck : healthcheck
+DockerCompose *--> "1..1" Volumes : volumes
+Services *--> "1..*" Service : service
+Service *--> "0..1" Build : build
+Service *--> "0..1" Depends_on : depends_on
+Service *--> "0..1" Environment : environment
+Service *--> "0..1" Healthcheck : healthcheck
+Depends_on *--> "1..1" Db : db
 
 @enduml

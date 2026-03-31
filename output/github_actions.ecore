@@ -4,27 +4,21 @@
     nsPrefix="github_actions">
   <eClassifiers xsi:type="ecore:EClass" name="GithubActions">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="on" lowerBound="1" eType="#//On"
-        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="jobs" lowerBound="1" eType="#//Jobs"
         containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="On">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="push" eType="#//Push" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="pullRequest" eType="#//Push"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="on" lowerBound="1" eType="#//On"
         containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Push">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="branches" upperBound="-1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Jobs">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="build" eType="#//Release"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="lint" eType="#//Release"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="release" eType="#//Release"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="job" lowerBound="1" upperBound="-1"
+        eType="#//Job" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Job">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="runsOn" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="steps" lowerBound="1" upperBound="-1"
+        eType="#//Step" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="permissions" eType="#//Permissions"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Step">
@@ -41,13 +35,19 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="files" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="generateReleaseNotes" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Release">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="runsOn" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="permissions" eType="#//Permissions"
+  <eClassifiers xsi:type="ecore:EClass" name="On">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="push" eType="#//Push" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pullRequest" eType="#//Pull_request"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="steps" lowerBound="1" upperBound="-1"
-        eType="#//Step" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Push">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="branches" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tags" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Pull_request">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="branches" lowerBound="1"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Permissions">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="contents" lowerBound="1"
