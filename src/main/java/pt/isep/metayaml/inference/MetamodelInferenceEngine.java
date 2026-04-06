@@ -35,7 +35,8 @@ public class MetamodelInferenceEngine implements IRuleEngine {
        this.refinementRules = List.of(
                new R1_OptionalRule(),
                new R2_TypeRefinementRule(),
-               new R3_ClassMergeRule()
+               new R3_ClassMergeRule(),
+               new R4_PassThroughEliminationRule()
        );
     }
 
@@ -71,9 +72,10 @@ public class MetamodelInferenceEngine implements IRuleEngine {
     }
 
     private void applyCreationRule(String key, Object value, MetaClass owner, InferredMetamodel metamodel) {
+        String normalizedKey = key.replace('-', '_');
         for(ICreationRule rule: creationRules){
             if(rule.appliesTo(value)){
-                rule.apply(key, value, owner, metamodel, this);
+                rule.apply(normalizedKey, value, owner, metamodel, this);
                 return;
             }
         }

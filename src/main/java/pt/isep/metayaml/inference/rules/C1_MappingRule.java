@@ -1,6 +1,8 @@
 package pt.isep.metayaml.inference.rules;
 
+import pt.isep.metayaml.model.DataType;
 import pt.isep.metayaml.model.InferredMetamodel;
+import pt.isep.metayaml.model.MetaAttribute;
 import pt.isep.metayaml.model.MetaClass;
 import pt.isep.metayaml.model.MetaReference;
 
@@ -51,6 +53,13 @@ public class C1_MappingRule implements ICreationRule {
 
         MetaClass target = metamodel.getOrCreateClass(targetName);
         target.incrementOccurrences();
+
+        if (isNamedMapContainer(owner)) {
+            target.findAttribute("id").ifPresentOrElse(
+                    MetaAttribute::incrementOccurrences,
+                    () -> target.addAttribute(new MetaAttribute("id", DataType.STRING, false, false))
+            );
+        }
 
         owner.findReference(refName).ifPresentOrElse(
                 existing -> existing.incrementOccurrences(),
