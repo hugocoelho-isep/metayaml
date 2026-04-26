@@ -59,6 +59,11 @@ public class R3_ClassMergeRule implements IRefinementRule {
         if(attrsB.isEmpty() && refB.isEmpty())
             return false;
 
+        // a single shared feature is not enough evidence that two classes represent the same concept
+        // (e.g. Release{types} and Issues{types} are structurally equal but semantically distinct)
+        if(attrsA.size() + refA.size() < 2)
+            return false;
+
         return attrsA.equals(attrsB) && refA.equals(refB);
     }
 

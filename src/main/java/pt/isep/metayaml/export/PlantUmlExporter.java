@@ -58,7 +58,11 @@ public class PlantUmlExporter implements IMetamodelExporter{
                 ? "[0..*]"
                 : (attr.isOptional() ? "[0..1]" : "[1..1]");
 
-        return "+ " + attr.getName() + " : " + attr.getType().name() + " " + multiplicity;
+        String typeName = attr.getType() == pt.isep.metayaml.model.DataType.MAP
+                ? "Map<String, String>"
+                : attr.getType().name();
+
+        return "+ " + attr.getName() + " : " + typeName + " " + multiplicity;
     }
 
     private String formatRelationship(MetaClass owner, MetaReference ref) {

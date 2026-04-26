@@ -5,8 +5,8 @@ skinparam classFontStyle bold
 
 class Ansible{
   + hosts : STRING [1..1]
-  + become : BOOLEAN [1..1]
   + name : STRING [1..1]
+  + become : BOOLEAN [1..1]
 }
 
 class Task{

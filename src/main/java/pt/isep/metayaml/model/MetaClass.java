@@ -47,6 +47,14 @@ public class MetaClass {
                 .equals(name)).findFirst();
     }
 
+    public void removeAttribute(String name) {
+        attributes.removeIf(a -> a.getName().equals(name));
+    }
+
+    public void removeReference(String name) {
+        references.removeIf(r -> r.getName().equals(name));
+    }
+
     public List<MetaAttribute> getAttributes() {
         return Collections.unmodifiableList(attributes);
     }

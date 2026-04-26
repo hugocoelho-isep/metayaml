@@ -19,8 +19,6 @@ class Service{
   + ports : STRING [0..*]
   + volumes : STRING [0..*]
   + restart : STRING [0..1]
-  + environment : STRING [0..*]
-  + depends_on : STRING [0..*]
 }
 
 class Build{

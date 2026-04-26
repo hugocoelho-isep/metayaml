@@ -7,6 +7,7 @@ import pt.isep.metayaml.model.MetaClass;
 import pt.isep.metayaml.model.MetaReference;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * C1 — Mapping rule.
@@ -24,6 +25,13 @@ import java.util.Map;
  * </pre>
  */
 public class C1_MappingRule implements ICreationRule {
+
+    /**
+     * Class names that must never be treated as named-map-containers,
+     * even if their name looks plural. These represent single flat mappings
+     * in the DSL (e.g. {@code defaults} is one object, not a map of named instances).
+     */
+    private static final Set<String> NON_CONTAINER_CLASS_NAMES = Set.of("Defaults");
 
     @Override
     public boolean appliesTo(Object value) {
@@ -82,6 +90,7 @@ public class C1_MappingRule implements ICreationRule {
      * </ol>
      */
     private boolean isNamedMapContainer(MetaClass owner) {
+        if (NON_CONTAINER_CLASS_NAMES.contains(owner.getName())) return false;
         if (!owner.getAttributes().isEmpty()) return false;
         String name = owner.getName();
         // reject compound names like GithubActions (uppercase after first char)
