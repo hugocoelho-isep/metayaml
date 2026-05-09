@@ -5,6 +5,7 @@ import pt.isep.metayaml.model.MetaClass;
 import pt.isep.metayaml.model.MetaReference;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * R4 — Pass-through elimination rule.
@@ -26,6 +27,9 @@ import java.util.ArrayList;
  * </pre>
  */
 public class R4_PassThroughEliminationRule implements IRefinementRule {
+
+    // Event sub-classes of On that must not be eliminated even with a single reference
+    private static final Set<String> PROTECTED_NAMES = Set.of("Workflow_call", "Workflow_dispatch");
 
     @Override
     public void apply(InferredMetamodel metamodel) {
@@ -61,7 +65,8 @@ public class R4_PassThroughEliminationRule implements IRefinementRule {
     }
 
     private boolean isPassThrough(MetaClass cls) {
-        return cls.getAttributes().isEmpty()
+        return !PROTECTED_NAMES.contains(cls.getName())
+                && cls.getAttributes().isEmpty()
                 && cls.getReferences().size() == 1
                 && cls.getReferences().get(0).isMany()
                 && cls.getReferences().get(0).isContainment();

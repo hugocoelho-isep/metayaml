@@ -7,18 +7,18 @@ class DockerCompose{
   + version : STRING [1..1]
 }
 
-class Volumes{
-  + prometheus_data : STRING [0..1]
-  + grafana_data : STRING [0..1]
-  + db_data : STRING [0..1]
-}
-
 class Service{
   + id : STRING [1..1]
   + image : STRING [1..1]
   + ports : STRING [0..*]
   + volumes : STRING [0..*]
   + restart : STRING [0..1]
+}
+
+class Volumes{
+  + prometheus_data : STRING [0..1]
+  + grafana_data : STRING [0..1]
+  + db_data : STRING [0..1]
 }
 
 class Build{
@@ -40,14 +40,14 @@ class Environment{
 }
 
 class Healthcheck{
-  + test : STRING [0..*]
+  + test : STRING [1..*]
   + interval : STRING [1..1]
   + timeout : STRING [1..1]
   + retries : INTEGER [1..1]
 }
 
-DockerCompose *--> "1..1" Volumes : volumes
 DockerCompose *--> "1..*" Service : services
+DockerCompose *--> "1..1" Volumes : volumes
 Service *--> "0..1" Build : build
 Service *--> "0..1" Depends_on : depends_on
 Service *--> "0..1" Environment : environment

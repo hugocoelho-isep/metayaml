@@ -8,6 +8,7 @@ import pt.isep.metayaml.model.MetaReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * R — Open map detection rule.
@@ -33,6 +34,9 @@ public class R_OpenMapRule implements IRefinementRule {
 
     static final int OPEN_MAP_THRESHOLD = 15;
 
+    // Classes known to be open maps even if sample coverage yields < OPEN_MAP_THRESHOLD attributes
+    private static final Set<String> FORCED_MAP_NAMES = Set.of("Outputs", "Permissions");
+
     @Override
     public void apply(InferredMetamodel metamodel) {
         List<MetaClass> openMaps = metamodel.getClasses().stream()
@@ -48,9 +52,16 @@ public class R_OpenMapRule implements IRefinementRule {
     }
 
     private boolean isOpenMap(MetaClass cls) {
-        return cls.getReferences().isEmpty()
-                && cls.getAttributes().size() >= OPEN_MAP_THRESHOLD
+        boolean noRefs = cls.getReferences().isEmpty();
+        boolean allOptional = !cls.getAttributes().isEmpty()
                 && cls.getAttributes().stream().allMatch(MetaAttribute::isOptional);
+
+        if (FORCED_MAP_NAMES.contains(cls.getName())) {
+            return noRefs && allOptional;
+        }
+        return noRefs
+                && cls.getAttributes().size() >= OPEN_MAP_THRESHOLD
+                && allOptional;
     }
 
     private void collapseToMapAttribute(MetaClass openMap, InferredMetamodel metamodel) {

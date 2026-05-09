@@ -55,7 +55,7 @@ public class PlantUmlExporter implements IMetamodelExporter{
 
     private String formatAttribute(MetaAttribute attr) {
         String multiplicity = attr.isMany()
-                ? "[0..*]"
+                ? (attr.isOptional() ? "[0..*]" : "[1..*]")
                 : (attr.isOptional() ? "[0..1]" : "[1..1]");
 
         String typeName = attr.getType() == pt.isep.metayaml.model.DataType.MAP

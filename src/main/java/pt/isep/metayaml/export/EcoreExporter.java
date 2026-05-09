@@ -33,6 +33,8 @@ public class EcoreExporter implements IMetamodelExporter{
 
     private static final String BASE_NS_URI = "http://www.isep.pt/metayaml/";
 
+    private EDataType mapStringStringType;
+
     @Override
     public Path export(InferredMetamodel metamodel, Path outputDirectory) throws IOException {
         Files.createDirectories(outputDirectory);
@@ -53,6 +55,13 @@ public class EcoreExporter implements IMetamodelExporter{
         ePackage.setName(sanitize(metamodel.getDslName()));
         ePackage.setNsPrefix(sanitize(metamodel.getDslName()));
         ePackage.setNsURI(BASE_NS_URI + sanitize(metamodel.getDslName()));
+
+        // register custom MapStringString EDataType for open-map attributes
+        EDataType mapType = EcoreFactory.eINSTANCE.createEDataType();
+        mapType.setName("MapStringString");
+        mapType.setInstanceClassName("java.util.Map");
+        ePackage.getEClassifiers().add(mapType);
+        this.mapStringStringType = mapType;
 
         // pass 1: create all Eclasses first (needed for cross-references)
         Map<String, EClass> eClassMap = new HashMap<>();
@@ -108,6 +117,7 @@ public class EcoreExporter implements IMetamodelExporter{
             case BOOLEAN -> ecore.getEBoolean();
             case INTEGER ->  ecore.getEInt();
             case FLOAT ->   ecore.getEFloat();
+            case MAP -> mapStringStringType;
             default -> ecore.getEString();
         };
     }
