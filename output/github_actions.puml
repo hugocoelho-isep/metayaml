@@ -13,12 +13,12 @@ class Job{
   + id : STRING [1..1]
   + runs_on : STRING [0..1]
   + name : STRING [0..1]
-  + needs : STRING [0..1]
+  + needs : STRING [0..*]
   + if : STRING [0..1]
   + uses : STRING [0..1]
   + permissions : Map<String, String> [0..1]
-  + env : Map<String, String> [0..1]
   + with : Map<String, String> [0..1]
+  + env : Map<String, String> [0..1]
   + outputs : Map<String, String> [0..1]
 }
 
@@ -32,8 +32,8 @@ class Step{
   + shell : STRING [0..1]
   + continue_on_error : BOOLEAN [0..1]
   + timeout_minutes : INTEGER [0..1]
-  + env : Map<String, String> [0..1]
   + with : Map<String, String> [0..1]
+  + env : Map<String, String> [0..1]
 }
 
 class On{
@@ -54,14 +54,14 @@ class Schedule{
   + cron : STRING [1..1]
 }
 
-class Concurrency{
-  + group : STRING [1..1]
-  + cancel_in_progress : BOOLEAN [1..1]
-}
-
 class Environment{
   + name : STRING [1..1]
   + url : STRING [0..1]
+}
+
+class Concurrency{
+  + group : STRING [1..1]
+  + cancel_in_progress : BOOLEAN [1..1]
 }
 
 class Strategy{
@@ -143,7 +143,7 @@ class Issues{
 }
 
 GithubActions *--> "1..*" Job : jobs
-GithubActions *--> "0..1" On : on
+GithubActions *--> "1..1" On : on
 GithubActions *--> "0..1" Concurrency : concurrency
 GithubActions *--> "0..1" Defaults : defaults
 Job *--> "0..*" Step : steps

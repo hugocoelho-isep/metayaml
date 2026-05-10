@@ -35,6 +35,11 @@ public class R_FeatureConflictRule implements IRefinementRule {
                     .toList();
 
             for (String name : conflicts) {
+                cls.findAttribute(name).ifPresent(attr ->
+                    cls.findReference(name).ifPresent(ref -> {
+                        for (int i = 0; i < attr.getOccurrences(); i++) ref.incrementOccurrences();
+                    })
+                );
                 cls.removeAttribute(name);
                 System.out.printf("[INFO] R_Conflict: removed attribute '%s.%s' (shadowed by reference)%n",
                         cls.getName(), name);

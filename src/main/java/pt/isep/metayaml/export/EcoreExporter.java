@@ -33,7 +33,7 @@ public class EcoreExporter implements IMetamodelExporter{
 
     private static final String BASE_NS_URI = "http://www.isep.pt/metayaml/";
 
-    private EDataType mapStringStringType;
+    private EClass keyValuePairClass;
 
     @Override
     public Path export(InferredMetamodel metamodel, Path outputDirectory) throws IOException {
@@ -56,12 +56,26 @@ public class EcoreExporter implements IMetamodelExporter{
         ePackage.setNsPrefix(sanitize(metamodel.getDslName()));
         ePackage.setNsURI(BASE_NS_URI + sanitize(metamodel.getDslName()));
 
-        // register custom MapStringString EDataType for open-map attributes
-        EDataType mapType = EcoreFactory.eINSTANCE.createEDataType();
-        mapType.setName("MapStringString");
-        mapType.setInstanceClassName("java.util.Map");
-        ePackage.getEClassifiers().add(mapType);
-        this.mapStringStringType = mapType;
+        // create shared KeyValuePair EClass for open-map attributes
+        EClass kvClass = factory.createEClass();
+        kvClass.setName("KeyValuePair");
+
+        EAttribute keyAttr = factory.createEAttribute();
+        keyAttr.setName("key");
+        keyAttr.setEType(EcorePackage.eINSTANCE.getEString());
+        keyAttr.setLowerBound(1);
+        keyAttr.setUpperBound(1);
+        kvClass.getEStructuralFeatures().add(keyAttr);
+
+        EAttribute valueAttr = factory.createEAttribute();
+        valueAttr.setName("value");
+        valueAttr.setEType(EcorePackage.eINSTANCE.getEString());
+        valueAttr.setLowerBound(1);
+        valueAttr.setUpperBound(1);
+        kvClass.getEStructuralFeatures().add(valueAttr);
+
+        ePackage.getEClassifiers().add(kvClass);
+        this.keyValuePairClass = kvClass;
 
         // pass 1: create all Eclasses first (needed for cross-references)
         Map<String, EClass> eClassMap = new HashMap<>();
@@ -85,11 +99,12 @@ public class EcoreExporter implements IMetamodelExporter{
 
     private void addAttributes(MetaClass metaClass, EClass eClass, EcoreFactory factory) {
         for (MetaAttribute attribute: metaClass.getAttributes()) {
+            if (attribute.getType() == DataType.MAP) continue; // emitted as EReference in addReferences
             EAttribute eAttribute = factory.createEAttribute();
             eAttribute.setName(sanitizeFeature(attribute.getName()));
             eAttribute.setEType(mapDataType(attribute.getType()));
             eAttribute.setLowerBound(attribute.isOptional() ? 0 : 1);
-            eAttribute.setUpperBound(attribute.isMany() ? -1 : 1); // -1 = unbounded (0..*)
+            eAttribute.setUpperBound(attribute.isMany() ? -1 : 1);
             eClass.getEStructuralFeatures().add(eAttribute);
         }
     }
@@ -109,16 +124,26 @@ public class EcoreExporter implements IMetamodelExporter{
             eReference.setUpperBound(reference.isMany() ? -1 : 1);
             eClass.getEStructuralFeatures().add(eReference);
         }
+
+        for (MetaAttribute attribute : metaClass.getAttributes()) {
+            if (attribute.getType() != DataType.MAP) continue;
+            EReference eReference = factory.createEReference();
+            eReference.setName(sanitizeFeature(attribute.getName()));
+            eReference.setEType(keyValuePairClass);
+            eReference.setContainment(true);
+            eReference.setLowerBound(attribute.isOptional() ? 0 : 1);
+            eReference.setUpperBound(-1); // a map always has multiple entries
+            eClass.getEStructuralFeatures().add(eReference);
+        }
     }
 
     private EDataType mapDataType(DataType type) {
         EcorePackage ecore = EcorePackage.eINSTANCE;
         return switch (type) {
             case BOOLEAN -> ecore.getEBoolean();
-            case INTEGER ->  ecore.getEInt();
-            case FLOAT ->   ecore.getEFloat();
-            case MAP -> mapStringStringType;
-            default -> ecore.getEString();
+            case INTEGER -> ecore.getEInt();
+            case FLOAT   -> ecore.getEFloat();
+            default      -> ecore.getEString();
         };
     }
 
