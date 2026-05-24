@@ -35,7 +35,8 @@ public class R_OpenMapRule implements IRefinementRule {
     static final int OPEN_MAP_THRESHOLD = 15;
 
     // Classes known to be open maps even if sample coverage yields < OPEN_MAP_THRESHOLD attributes
-    private static final Set<String> FORCED_MAP_NAMES = Set.of("Outputs", "Permissions");
+    private static final Set<String> FORCED_MAP_NAMES = Set.of("Outputs");
+    // private static final Set<String> FORCED_MAP_NAMES = Set.of("Outputs", "Permissions");
 
     @Override
     public void apply(InferredMetamodel metamodel) {

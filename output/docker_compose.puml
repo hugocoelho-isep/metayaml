@@ -11,14 +11,26 @@ class Service{
   + id : STRING [1..1]
   + image : STRING [1..1]
   + ports : STRING [0..*]
-  + volumes : STRING [0..*]
   + restart : STRING [0..1]
 }
 
-class Volumes{
-  + prometheus_data : STRING [0..1]
-  + grafana_data : STRING [0..1]
-  + db_data : STRING [0..1]
+class Volume{
+  + id : STRING [1..1]
+}
+
+class Environment{
+  + POSTGRES_DB : STRING [0..1]
+  + POSTGRES_USER : STRING [0..1]
+  + POSTGRES_PASSWORD : STRING [0..1]
+  + GF_SECURITY_ADMIN_USER=admin : STRING [0..1]
+  + GF_SECURITY_ADMIN_PASSWORD=admin : STRING [0..1]
+  + SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mydb : STRING [0..1]
+  + SPRING_DATASOURCE_USERNAME=admin : STRING [0..1]
+  + SPRING_DATASOURCE_PASSWORD=secret : STRING [0..1]
+}
+
+class Depends_on{
+  + prometheus : STRING [0..1]
 }
 
 class Build{
@@ -26,32 +38,31 @@ class Build{
   + dockerfile : STRING [1..1]
 }
 
-class Depends_on{
-}
-
 class Db{
   + condition : STRING [1..1]
 }
 
-class Environment{
-  + POSTGRES_DB : STRING [1..1]
-  + POSTGRES_USER : STRING [1..1]
-  + POSTGRES_PASSWORD : STRING [1..1]
-}
-
 class Healthcheck{
-  + test : STRING [1..*]
   + interval : STRING [1..1]
   + timeout : STRING [1..1]
   + retries : INTEGER [1..1]
 }
 
+class Test{
+  + CMD : STRING [0..1]
+  + pg_isready : STRING [0..1]
+  + _U : STRING [0..1]
+  + admin : STRING [0..1]
+}
+
 DockerCompose *--> "1..*" Service : services
-DockerCompose *--> "1..1" Volumes : volumes
-Service *--> "0..1" Build : build
-Service *--> "0..1" Depends_on : depends_on
+DockerCompose *--> "0..*" Volume : volumes
+Service *--> "0..*" Volume : volumes
 Service *--> "0..1" Environment : environment
+Service *--> "0..1" Depends_on : depends_on
+Service *--> "0..1" Build : build
 Service *--> "0..1" Healthcheck : healthcheck
-Depends_on *--> "1..1" Db : db
+Depends_on *--> "0..1" Db : db
+Healthcheck *--> "1..1" Test : test
 
 @enduml

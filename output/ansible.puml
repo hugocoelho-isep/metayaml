@@ -4,19 +4,9 @@ skinparam classAttributeIconSize 0
 skinparam classFontStyle bold
 
 class Ansible{
+  + hosts : STRING [1..1]
   + name : STRING [1..1]
   + become : BOOLEAN [1..1]
-  + hosts : STRING [1..1]
-}
-
-class Vars{
-  + backup_dir : STRING [0..1]
-  + db_name : STRING [0..1]
-  + db_user : STRING [0..1]
-  + retention_days : INTEGER [0..1]
-  + app_port : INTEGER [0..1]
-  + app_user : STRING [0..1]
-  + app_dir : STRING [0..1]
 }
 
 class Task{
@@ -47,6 +37,16 @@ class Find{
   + patterns : STRING [1..1]
 }
 
+class Vars{
+  + backup_dir : STRING [0..1]
+  + db_name : STRING [0..1]
+  + db_user : STRING [0..1]
+  + retention_days : INTEGER [0..1]
+  + app_port : INTEGER [0..1]
+  + app_user : STRING [0..1]
+  + app_dir : STRING [0..1]
+}
+
 class Apt{
   + name : STRING [1..1]
   + state : STRING [1..1]
@@ -72,8 +72,8 @@ class Systemd{
   + enabled : BOOLEAN [1..1]
 }
 
-Ansible *--> "1..1" Vars : vars
 Ansible *--> "1..*" Task : tasks
+Ansible *--> "1..1" Vars : vars
 Task *--> "0..1" File : file
 Task *--> "0..1" Archive : archive
 Task *--> "0..1" Find : find
