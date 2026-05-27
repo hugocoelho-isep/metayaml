@@ -7,15 +7,15 @@ class DockerCompose{
   + version : STRING [1..1]
 }
 
+class Volume{
+  + id : STRING [1..1]
+}
+
 class Service{
   + id : STRING [1..1]
   + image : STRING [1..1]
   + ports : STRING [0..*]
   + restart : STRING [0..1]
-}
-
-class Volume{
-  + id : STRING [1..1]
 }
 
 class Environment{
@@ -55,8 +55,8 @@ class Test{
   + admin : STRING [0..1]
 }
 
-DockerCompose *--> "1..*" Service : services
 DockerCompose *--> "0..*" Volume : volumes
+DockerCompose *--> "1..*" Service : services
 Service *--> "0..*" Volume : volumes
 Service *--> "0..1" Environment : environment
 Service *--> "0..1" Depends_on : depends_on

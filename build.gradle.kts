@@ -1,5 +1,10 @@
 plugins {
     id("java")
+    application
+}
+
+application {
+    mainClass.set("pt.isep.metayaml.Main")
 }
 
 group = "pt.isep.metayaml"
