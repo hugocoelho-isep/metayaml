@@ -74,6 +74,55 @@ public class YamlParser {
     }
 
     /**
+     * Parses the given YAML file into one or more root mappings.
+     *
+     * <p>Most configuration formats (e.g. GitHub Actions, Docker Compose) have a
+     * single mapping at the top level. Some formats — notably Ansible playbooks —
+     * use a top-level sequence whose elements are mappings (a list of "plays"). In
+     * that case each element is returned as a separate root mapping, so the
+     * inference engine treats every play as an independent document of the same DSL.
+     *
+     * @param filePath path to the YAML file
+     * @return one root mapping for a mapping-rooted file, or one per element for a
+     *         sequence-rooted file
+     * @throws YamlParseException if the file cannot be read, is empty, or has a top
+     *         level that is neither a mapping nor a sequence of mappings
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> parseToRootMaps(Path filePath) throws YamlParseException {
+        try (InputStream in = Files.newInputStream(filePath)) {
+            Object raw = yaml.load(in);
+            List<Map<String, Object>> roots = new ArrayList<>();
+            if (raw == null) {
+                throw new YamlParseException("Empty YAML file: " + filePath);
+            } else if (raw instanceof Map) {
+                Map<String, Object> content = (Map<String, Object>) raw;
+                normalizeNulls(content);
+                roots.add(content);
+            } else if (raw instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map) {
+                        Map<String, Object> content = (Map<String, Object>) item;
+                        normalizeNulls(content);
+                        roots.add(content);
+                    }
+                }
+                if (roots.isEmpty()) {
+                    throw new YamlParseException(
+                            "Top-level sequence contains no mappings: " + filePath);
+                }
+            } else {
+                throw new YamlParseException(
+                        "Expected a YAML mapping or sequence of mappings at the top level, but got "
+                                + raw.getClass().getSimpleName() + ": " + filePath);
+            }
+            return roots;
+        } catch (IOException e) {
+            throw new YamlParseException("Failed to read file: " + filePath, e);
+        }
+    }
+
+    /**
      * Recursively replaces null or empty-string values in the YAML tree with
      * empty maps so that bare keys (e.g. {@code workflow_dispatch:}) are treated
      * as empty objects rather than scalars by the inference engine.

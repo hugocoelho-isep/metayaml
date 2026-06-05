@@ -39,6 +39,8 @@ public class MetamodelInferenceEngine implements IRuleEngine {
                new R2_TypeRefinementRule(),        // refine NULL types
                new R_EmptyClassRemovalRule(),      // remove empty artefact classes
                new R_OpenMapRule(),               // collapse open-map classes to MAP attributes
+               new R_OpenListMapRule(),            // collapse open-list-map classes to MatrixParameter pattern
+               new R_IncludeExcludeKvpRule(),      // normalize Include/Exclude attrs to KeyValuePair entries
                new R3_ClassMergeRule(),            // merge structurally equivalent classes
                new R4_PassThroughEliminationRule() // collapse pass-through containers
        );

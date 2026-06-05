@@ -6,6 +6,7 @@ import pt.isep.metayaml.model.ParsedDocument;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,26 +52,36 @@ public class InputLoader {
             }
             for (Path file : files) {
                 try {
-                    Map<String, Object> content = parser.parseToMap(file);
-                    rawDocs.add(new RawDoc(source.name(), file, content));
-                    System.out.printf("[INFO] Parsed: [%s] %s%n", source.name(), file.getFileName());
+                    List<Map<String, Object>> roots = parser.parseToRootMaps(file);
+                    for (Map<String, Object> content : roots) {
+                        rawDocs.add(new RawDoc(source.name(), file, content));
+                    }
+                    if (roots.size() > 1) {
+                        System.out.printf("[INFO] Parsed: [%s] %s (%d documents)%n",
+                                source.name(), file.getFileName(), roots.size());
+                    } else {
+                        System.out.printf("[INFO] Parsed: [%s] %s%n", source.name(), file.getFileName());
+                    }
                 } catch (YamlParseException e) {
                     System.out.printf("[WARN] Skipped '%s': %s%n", file.getFileName(), e.getMessage());
                 }
             }
         }
 
-        // Collect keys whose values are mappings in at least one document
-        Set<String> mappingKeys = new HashSet<>();
+        // Collect keys whose values are mappings, scoped PER SOURCE so that each DSL
+        // is inferred independently: a key that is a mapping in one DSL must not
+        // influence the normalisation of an unrelated DSL configured in the same run.
+        Map<String, Set<String>> mappingKeysBySource = new HashMap<>();
         for (RawDoc rd : rawDocs) {
-            collectMappingKeys(rd.content(), mappingKeys);
+            Set<String> keys = mappingKeysBySource.computeIfAbsent(rd.dslName(), k -> new HashSet<>());
+            collectMappingKeys(rd.content(), keys);
         }
 
-        // Pass 2: normalise string-lists → map-of-empty-maps for mapping keys,
-        // then wrap in immutable ParsedDocument
+        // Pass 2: normalise string-lists → map-of-empty-maps using the per-source
+        // mapping keys, then wrap in immutable ParsedDocument
         List<ParsedDocument> documents = new ArrayList<>();
         for (RawDoc rd : rawDocs) {
-            normalizeStringLists(rd.content(), mappingKeys);
+            normalizeStringLists(rd.content(), mappingKeysBySource.get(rd.dslName()));
             documents.add(new ParsedDocument(rd.dslName(), rd.path(), rd.content()));
         }
 
