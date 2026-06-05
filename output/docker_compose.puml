@@ -4,65 +4,102 @@ skinparam classAttributeIconSize 0
 skinparam classFontStyle bold
 
 class DockerCompose{
-  + version : STRING [1..1]
-}
-
-class Volume{
-  + id : STRING [1..1]
+  + version : STRING [0..1]
+  + name : STRING [0..1]
 }
 
 class Service{
   + id : STRING [1..1]
-  + image : STRING [1..1]
   + ports : STRING [0..*]
+  + image : STRING [0..1]
   + restart : STRING [0..1]
-}
-
-class Environment{
-  + POSTGRES_DB : STRING [0..1]
-  + POSTGRES_USER : STRING [0..1]
-  + POSTGRES_PASSWORD : STRING [0..1]
-  + GF_SECURITY_ADMIN_USER=admin : STRING [0..1]
-  + GF_SECURITY_ADMIN_PASSWORD=admin : STRING [0..1]
-  + SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mydb : STRING [0..1]
-  + SPRING_DATASOURCE_USERNAME=admin : STRING [0..1]
-  + SPRING_DATASOURCE_PASSWORD=secret : STRING [0..1]
-}
-
-class Depends_on{
-  + prometheus : STRING [0..1]
+  + container_name : STRING [0..1]
+  + command : STRING [0..*]
+  + stop_signal : STRING [0..1]
+  + expose : INTEGER [0..*]
+  + user : STRING [0..1]
+  + hostname : STRING [0..1]
+  + cap_add : STRING [0..*]
+  + network_mode : STRING [0..1]
+  + stdin_open : BOOLEAN [0..1]
+  + labels : STRING [0..*]
+  + platform : STRING [0..1]
+  + runtime : STRING [0..1]
+  + sysctls : STRING [0..*]
+  + environment : Map<String, String> [0..1]
 }
 
 class Build{
   + context : STRING [1..1]
-  + dockerfile : STRING [1..1]
+  + target : STRING [0..1]
+  + args : STRING [0..*]
+  + dockerfile : STRING [0..1]
 }
 
-class Db{
-  + condition : STRING [1..1]
+class Volume{
+  + id : STRING [0..1]
+  + type : STRING [0..1]
+  + source : STRING [0..1]
+  + target : STRING [0..1]
+  + read_only : BOOLEAN [0..1]
 }
 
 class Healthcheck{
+  + test : STRING [1..*]
   + interval : STRING [1..1]
-  + timeout : STRING [1..1]
   + retries : INTEGER [1..1]
+  + start_period : STRING [0..1]
+  + timeout : STRING [0..1]
 }
 
-class Test{
-  + CMD : STRING [0..1]
-  + pg_isready : STRING [0..1]
-  + _U : STRING [0..1]
-  + admin : STRING [0..1]
+class Network{
+  + id : STRING [1..1]
+  + driver : STRING [0..1]
+  + ipv4_address : STRING [0..1]
 }
 
-DockerCompose *--> "0..*" Volume : volumes
+class Depends_on{
+  + elasticsearch : STRING [0..1]
+  + redis : STRING [0..1]
+  + prometheus : STRING [0..1]
+  + backend : STRING [0..1]
+  + mongo : STRING [0..1]
+  + web1 : STRING [0..1]
+  + web2 : STRING [0..1]
+  + flask_app : STRING [0..1]
+  + cloudflared : STRING [0..1]
+}
+
+class Resource{
+  + id : STRING [1..1]
+  + memory : STRING [1..1]
+}
+
+class Secret{
+  + id : STRING [1..1]
+  + file : STRING [0..1]
+}
+
+class Db{
+  + condition : STRING [0..1]
+}
+
+class Config{
+  + subnet : STRING [1..1]
+}
+
 DockerCompose *--> "1..*" Service : services
-Service *--> "0..*" Volume : volumes
-Service *--> "0..1" Environment : environment
-Service *--> "0..1" Depends_on : depends_on
+DockerCompose *--> "0..*" Network : networks
+DockerCompose *--> "0..*" Volume : volumes
+DockerCompose *--> "0..*" Secret : secrets
 Service *--> "0..1" Build : build
+Service *--> "0..*" Volume : volumes
 Service *--> "0..1" Healthcheck : healthcheck
+Service *--> "0..*" Network : networks
+Service *--> "0..1" Depends_on : depends_on
+Service *--> "0..*" Resource : deploy
+Service *--> "0..*" Secret : secrets
+Network *--> "0..*" Config : ipam
 Depends_on *--> "0..1" Db : db
-Healthcheck *--> "1..1" Test : test
 
 @enduml

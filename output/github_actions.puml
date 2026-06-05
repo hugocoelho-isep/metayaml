@@ -29,8 +29,8 @@ class Job{
   + needs : STRING [0..*]
   + if : STRING [0..1]
   + uses : STRING [0..1]
-  + with : Map<String, String> [0..1]
   + env : Map<String, String> [0..1]
+  + with : Map<String, String> [0..1]
   + outputs : Map<String, String> [0..1]
 }
 
@@ -44,8 +44,8 @@ class Step{
   + shell : STRING [0..1]
   + continue_on_error : BOOLEAN [0..1]
   + timeout_minutes : INTEGER [0..1]
-  + with : Map<String, String> [0..1]
   + env : Map<String, String> [0..1]
+  + with : Map<String, String> [0..1]
 }
 
 class Permissions{
@@ -84,27 +84,14 @@ class Strategy{
 }
 
 class Matrix{
-  + os : STRING [0..*]
-  + build_type : STRING [0..*]
-  + c_compiler : STRING [0..*]
-  + otp : STRING [0..*]
-  + elixir : STRING [0..*]
-  + python_version : FLOAT [0..*]
-  + configuration : STRING [0..*]
-  + node_version : STRING [0..*]
-  + r_version : STRING [0..*]
-  + ruby_version : STRING [0..*]
 }
 
 class Include{
-  + os : STRING [1..1]
-  + c_compiler : STRING [1..1]
-  + cpp_compiler : STRING [1..1]
+  + entries : Map<String, String> [1..*]
 }
 
 class Exclude{
-  + os : STRING [1..1]
-  + c_compiler : STRING [1..1]
+  + entries : Map<String, String> [1..*]
 }
 
 class Workflow_call{
@@ -153,6 +140,11 @@ class Service{
   + env : Map<String, String> [0..1]
 }
 
+class MatrixParameter{
+  + key : STRING [1..1]
+  + values : STRING [1..*]
+}
+
 GithubActions *--> "1..1" On : on
 GithubActions *--> "1..*" Job : jobs
 GithubActions *--> "0..1" Permissions : permissions
@@ -178,6 +170,7 @@ Workflow_dispatch *--> "0..*" Input : inputs
 Strategy *--> "0..1" Matrix : matrix
 Matrix *--> "0..*" Include : include
 Matrix *--> "0..*" Exclude : exclude
+Matrix *--> "0..*" MatrixParameter : parameters
 Workflow_call *--> "1..*" Secret : secrets
 Defaults *--> "1..1" Run : run
 
