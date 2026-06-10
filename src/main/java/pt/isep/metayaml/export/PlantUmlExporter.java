@@ -34,12 +34,24 @@ public class PlantUmlExporter implements IMetamodelExporter{
 
         // class definition
         for(MetaClass metaClass: metamodel.getClasses()){
-            sb.append("class ").append(metaClass.getName()).append("{\n");
+            sb.append(metaClass.isAbstract() ? "abstract class " : "class ");
+            sb.append(metaClass.getName()).append("{\n");
             for(MetaAttribute attr: metaClass.getAttributes()){
                 sb.append("  ").append(formatAttribute(attr)).append("\n");
             }
             sb.append("}\n\n");
         }
+
+        // inheritance (supertype <|-- subtype)
+        for(MetaClass metaClass: metamodel.getClasses()){
+            if(metaClass.getSuperType() != null){
+                sb.append(metaClass.getSuperType().getName())
+                        .append(" <|-- ")
+                        .append(metaClass.getName())
+                        .append("\n");
+            }
+        }
+        sb.append("\n");
 
         // relationships
         for(MetaClass metaClass: metamodel.getClasses()){
@@ -55,15 +67,19 @@ public class PlantUmlExporter implements IMetamodelExporter{
 
     private String formatAttribute(MetaAttribute attr) {
         String multiplicity = attr.isMany()
-                ? "[0..*]"
+                ? (attr.isOptional() ? "[0..*]" : "[1..*]")
                 : (attr.isOptional() ? "[0..1]" : "[1..1]");
 
-        return "+ " + attr.getName() + " : " + attr.getType().name() + " " + multiplicity;
+        String typeName = attr.getType() == pt.isep.metayaml.model.DataType.MAP
+                ? "Map<String, String>"
+                : attr.getType().name();
+
+        return "+ " + attr.getName() + " : " + typeName + " " + multiplicity;
     }
 
     private String formatRelationship(MetaClass owner, MetaReference ref) {
         String multiplicity = ref.isMany()
-                ? "[0..*]"
+                ? (ref.isOptional() ? "\"0..*\"" : "\"1..*\"")
                 : (ref.isOptional() ? "\"0..1\"" : "\"1..1\"");
 
         if(ref.isContainment()){

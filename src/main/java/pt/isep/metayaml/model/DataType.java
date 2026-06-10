@@ -9,5 +9,7 @@ public enum DataType {
     FLOAT,
     BOOLEAN,
     NULL,
-    UNKNOWN
+    UNKNOWN,
+    /** Open map: any string key maps to a string value (e.g. {@code env}, {@code with}). */
+    MAP
 }

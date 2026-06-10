@@ -33,9 +33,16 @@ public class MetamodelInferenceEngine implements IRuleEngine {
         ); // The list of order must be on this order
 
        this.refinementRules = List.of(
-               new R1_OptionalRule(),
-               new R2_TypeRefinementRule(),
-               new R3_ClassMergeRule()
+               new R_PolymorphicFeatureRule(),    // scalar+object conflicts -> abstract + 2 subtypes
+               new R1_OptionalRule(),             // mark optional by occurrence count
+               new R_SharedClassOptionalRule(),   // shared classes are always optional
+               new R2_TypeRefinementRule(),        // refine NULL types
+               new R_EmptyClassRemovalRule(),      // remove empty artefact classes
+               new R_OpenMapRule(),               // collapse open-map classes to MAP attributes
+               new R_OpenListMapRule(),            // collapse open-list-map classes to MatrixParameter pattern
+               new R_IncludeExcludeKvpRule(),      // normalize Include/Exclude attrs to KeyValuePair entries
+               new R3_ClassMergeRule(),            // merge structurally equivalent classes
+               new R4_PassThroughEliminationRule() // collapse pass-through containers
        );
     }
 
@@ -64,16 +71,23 @@ public class MetamodelInferenceEngine implements IRuleEngine {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void processMapping(Map<String, Object> mapping, MetaClass owner, InferredMetamodel metamodel) {
-        for (Map.Entry<String, Object> entry : mapping.entrySet()) {
-            applyCreationRule(entry.getKey(), entry.getValue(), owner, metamodel);
+        // Cast through Object to bypass generic type enforcement; some YAML maps have non-String keys
+        // (e.g. complex/flow keys parsed by SnakeYAML as LinkedHashMap) — those are skipped.
+        Map<Object, Object> raw = (Map<Object, Object>) (Object) mapping;
+        for (Map.Entry<Object, Object> entry : raw.entrySet()) {
+            if (entry.getKey() instanceof String key) {
+                applyCreationRule(key, entry.getValue(), owner, metamodel);
+            }
         }
     }
 
     private void applyCreationRule(String key, Object value, MetaClass owner, InferredMetamodel metamodel) {
+        String normalizedKey = key.replace('-', '_');
         for(ICreationRule rule: creationRules){
             if(rule.appliesTo(value)){
-                rule.apply(key, value, owner, metamodel, this);
+                rule.apply(normalizedKey, value, owner, metamodel, this);
                 return;
             }
         }

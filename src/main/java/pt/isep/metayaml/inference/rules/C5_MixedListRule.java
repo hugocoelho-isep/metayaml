@@ -29,7 +29,7 @@ public class C5_MixedListRule implements ICreationRule {
     @Override
     public void apply(String key, Object value, MetaClass owner, InferredMetamodel metamodel, IRuleEngine engine) {
         owner.findAttribute(key).ifPresentOrElse(
-                existing -> existing.setOptional(true),
+                existing -> existing.incrementOccurrences(),
                 () -> owner.addAttribute(new MetaAttribute(key, DataType.UNKNOWN, false, true))
         );
     }

@@ -47,7 +47,7 @@ public class MetaAttribute {
 
     @Override
     public String toString() {
-        String multiplicity = many ? "[0..*]" : (optional ? "[0..1]" : "[1..1]");
+        String multiplicity = many ? (optional ? "[0..*]" : "[1..*]") : (optional ? "[0..1]" : "[1..1]");
         return name + " : " + type + " " + multiplicity;
     }
 }

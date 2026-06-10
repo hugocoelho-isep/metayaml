@@ -4,32 +4,11 @@ skinparam classAttributeIconSize 0
 skinparam classFontStyle bold
 
 class GithubActions{
-  + name : STRING [1..1]
-}
-
-class Jobs{
-}
-
-class Build{
-  + runs-on : STRING [1..1]
-}
-
-class Step{
-  + name : STRING [1..1]
-  + uses : STRING [0..1]
-  + run : STRING [0..1]
-}
-
-class With{
-  + java-version : STRING [0..1]
-  + distribution : STRING [0..1]
   + name : STRING [0..1]
-  + path : STRING [0..1]
-  + files : STRING [0..1]
-  + generate_release_notes : BOOLEAN [0..1]
+  + env : Map<String, String> [0..1]
 }
 
-class On{
+abstract class On{
 }
 
 class Push{
@@ -39,26 +18,197 @@ class Push{
 
 class Pull_request{
   + branches : STRING [0..*]
+  + types : STRING [0..*]
+}
+
+class Job{
+  + id : STRING [1..1]
+  + runs_on : STRING [0..1]
+  + name : STRING [0..1]
+  + needs : STRING [0..*]
+  + if : STRING [0..1]
+  + uses : STRING [0..1]
+  + with : Map<String, String> [0..1]
+  + env : Map<String, String> [0..1]
+  + outputs : Map<String, String> [0..1]
+}
+
+class Step{
+  + name : STRING [0..1]
+  + uses : STRING [0..1]
+  + run : STRING [0..1]
+  + id : STRING [0..1]
+  + if : STRING [0..1]
+  + working_directory : STRING [0..1]
+  + shell : STRING [0..1]
+  + continue_on_error : BOOLEAN [0..1]
+  + timeout_minutes : INTEGER [0..1]
+  + with : Map<String, String> [0..1]
+  + env : Map<String, String> [0..1]
+}
+
+abstract class Permissions{
+}
+
+class Schedule{
+  + cron : STRING [1..1]
+}
+
+class Workflow_dispatch{
+}
+
+class Concurrency{
+  + group : STRING [1..1]
+  + cancel_in_progress : BOOLEAN [1..1]
+}
+
+abstract class Environment{
+}
+
+class Strategy{
+  + fail_fast : BOOLEAN [0..1]
+  + max_parallel : INTEGER [0..1]
+}
+
+abstract class Matrix{
+}
+
+class Include{
+  + entries : Map<String, String> [1..*]
+}
+
+class Exclude{
+  + entries : Map<String, String> [1..*]
+}
+
+class Workflow_call{
+}
+
+class Secret{
+  + id : STRING [1..1]
+  + required : BOOLEAN [1..1]
+}
+
+class Container{
+  + image : STRING [1..1]
+}
+
+class Defaults{
+}
+
+class Run{
+  + shell : STRING [1..1]
 }
 
 class Release{
-  + runs-on : STRING [1..1]
+  + types : STRING [1..*]
 }
 
-class Permissions{
-  + contents : STRING [1..1]
+class Input{
+  + id : STRING [1..1]
+  + description : STRING [1..1]
+  + default : STRING [1..1]
+  + required : BOOLEAN [1..1]
+  + type : STRING [1..1]
 }
 
-GithubActions --> "0..1" Jobs : jobs
-GithubActions --> "0..1" On : on
-Jobs --> "0..1" Build : build
-Jobs --> "0..1" Build : lint
-Jobs --> "0..1" Release : release
-Build *--> [0..*] Step : steps
-Step --> "0..1" With : with
-On --> "0..1" Push : push
-On --> "0..1" Pull_request : pull_request
-Release --> "1..1" Permissions : permissions
-Release *--> [0..*] Step : steps
+class Merge_group{
+  + branches : STRING [1..*]
+}
+
+class Service{
+  + id : STRING [1..1]
+  + image : STRING [1..1]
+  + ports : STRING [1..*]
+  + env : Map<String, String> [0..1]
+}
+
+class Issues{
+  + types : STRING [1..*]
+}
+
+class PermissionsObject{
+  + contents : STRING [0..1]
+  + security_events : STRING [0..1]
+  + actions : STRING [0..1]
+  + pages : STRING [0..1]
+  + id_token : STRING [0..1]
+  + pull_requests : STRING [0..1]
+  + issues : STRING [0..1]
+  + packages : STRING [0..1]
+  + models : STRING [0..1]
+  + checks : STRING [0..1]
+}
+
+class PermissionsValue{
+  + value : STRING [1..1]
+}
+
+class OnObject{
+  + branch_protection_rule : STRING [0..1]
+}
+
+class OnValue{
+  + value : STRING [1..*]
+}
+
+class EnvironmentObject{
+  + name : STRING [1..1]
+  + url : STRING [0..1]
+}
+
+class EnvironmentValue{
+  + value : STRING [1..1]
+}
+
+class MatrixObject{
+}
+
+class MatrixValue{
+  + value : STRING [1..1]
+}
+
+class MatrixParameter{
+  + key : STRING [1..1]
+  + values : STRING [1..*]
+}
+
+Permissions <|-- PermissionsObject
+Permissions <|-- PermissionsValue
+On <|-- OnObject
+On <|-- OnValue
+Environment <|-- EnvironmentObject
+Environment <|-- EnvironmentValue
+Matrix <|-- MatrixObject
+Matrix <|-- MatrixValue
+
+GithubActions *--> "1..1" On : on
+GithubActions *--> "1..*" Job : jobs
+GithubActions *--> "0..1" Permissions : permissions
+GithubActions *--> "0..1" Concurrency : concurrency
+GithubActions *--> "0..1" Defaults : defaults
+Job *--> "0..*" Step : steps
+Job *--> "0..1" Permissions : permissions
+Job *--> "0..1" Environment : environment
+Job *--> "0..1" Strategy : strategy
+Job *--> "0..1" Container : container
+Job *--> "0..*" Service : services
+Job *--> "0..1" Defaults : defaults
+Workflow_dispatch *--> "0..*" Input : inputs
+Strategy *--> "0..1" Matrix : matrix
+Workflow_call *--> "1..*" Secret : secrets
+Defaults *--> "1..1" Run : run
+OnObject *--> "0..1" Push : push
+OnObject *--> "0..1" Pull_request : pull_request
+OnObject *--> "0..*" Schedule : schedule
+OnObject *--> "0..1" Workflow_dispatch : workflow_dispatch
+OnObject *--> "0..1" Workflow_call : workflow_call
+OnObject *--> "0..1" Pull_request : pull_request_target
+OnObject *--> "0..1" Release : release
+OnObject *--> "0..1" Merge_group : merge_group
+OnObject *--> "0..1" Issues : issues
+MatrixObject *--> "0..*" Include : include
+MatrixObject *--> "0..*" Exclude : exclude
+MatrixObject *--> "0..*" MatrixParameter : parameters
 
 @enduml

@@ -4,78 +4,142 @@ skinparam classAttributeIconSize 0
 skinparam classFontStyle bold
 
 class DockerCompose{
-  + version : STRING [1..1]
+  + version : STRING [0..1]
+  + name : STRING [0..1]
 }
 
-class Services{
-}
-
-class Prometheus{
-  + image : STRING [1..1]
+class Service{
+  + id : STRING [1..1]
   + ports : STRING [0..*]
-  + volumes : STRING [0..*]
-  + restart : STRING [1..1]
-}
-
-class Grafana{
-  + image : STRING [1..1]
-  + ports : STRING [0..*]
-  + environment : STRING [0..*]
-  + volumes : STRING [0..*]
-  + depends_on : STRING [0..*]
-  + restart : STRING [1..1]
-}
-
-class Volumes{
-  + prometheus-data : STRING [0..1]
-  + grafana-data : STRING [0..1]
-  + db-data : STRING [0..1]
-}
-
-class App{
-  + image : STRING [1..1]
-  + ports : STRING [0..*]
-  + environment : STRING [0..*]
-  + restart : STRING [1..1]
-}
-
-class Build{
-  + context : STRING [1..1]
-  + dockerfile : STRING [1..1]
-}
-
-class Depends_on{
-}
-
-class Db{
-  + condition : STRING [0..1]
   + image : STRING [0..1]
-  + volumes : STRING [0..*]
+  + restart : STRING [0..1]
+  + container_name : STRING [0..1]
+  + command : STRING [0..*]
+  + stop_signal : STRING [0..1]
+  + expose : INTEGER [0..*]
+  + secrets : STRING [0..*]
+  + user : STRING [0..1]
+  + hostname : STRING [0..1]
+  + cap_add : STRING [0..*]
+  + network_mode : STRING [0..1]
+  + stdin_open : BOOLEAN [0..1]
+  + labels : STRING [0..*]
+  + platform : STRING [0..1]
+  + runtime : STRING [0..1]
+  + sysctls : STRING [0..*]
 }
 
-class Environment{
-  + POSTGRES_DB : STRING [1..1]
-  + POSTGRES_USER : STRING [1..1]
-  + POSTGRES_PASSWORD : STRING [1..1]
+abstract class Build{
+}
+
+abstract class Environment{
 }
 
 class Healthcheck{
-  + test : STRING [0..*]
+  + test : STRING [1..*]
   + interval : STRING [1..1]
-  + timeout : STRING [1..1]
   + retries : INTEGER [1..1]
+  + start_period : STRING [0..1]
+  + timeout : STRING [0..1]
 }
 
-DockerCompose --> "0..1" Services : services
-DockerCompose --> "0..1" Volumes : volumes
-Services --> "0..1" Prometheus : prometheus
-Services --> "0..1" Grafana : grafana
-Services --> "0..1" App : app
-Services --> "0..1" Db : db
-App --> "1..1" Build : build
-App --> "1..1" Depends_on : depends_on
-Depends_on --> "1..1" Db : db
-Db --> "0..1" Environment : environment
-Db --> "0..1" Healthcheck : healthcheck
+abstract class Networks{
+}
+
+class Network{
+  + id : STRING [1..1]
+  + driver : STRING [0..1]
+  + ipv4_address : STRING [0..1]
+}
+
+abstract class Volume{
+}
+
+class Resource{
+  + id : STRING [1..1]
+  + memory : STRING [1..1]
+}
+
+abstract class Depends_on{
+}
+
+class Db{
+  + condition : STRING [1..1]
+}
+
+class Secret{
+  + id : STRING [1..1]
+  + file : STRING [1..1]
+}
+
+class Config{
+  + subnet : STRING [1..1]
+}
+
+class VolumeObject{
+  + id : STRING [0..1]
+  + type : STRING [0..1]
+  + source : STRING [0..1]
+  + target : STRING [0..1]
+  + read_only : BOOLEAN [0..1]
+}
+
+class VolumeValue{
+  + value : STRING [1..*]
+}
+
+class BuildObject{
+  + context : STRING [1..1]
+  + target : STRING [0..1]
+  + args : STRING [0..*]
+  + dockerfile : STRING [0..1]
+}
+
+class BuildValue{
+  + value : STRING [1..1]
+}
+
+class NetworksObject{
+}
+
+class NetworksValue{
+  + value : STRING [1..*]
+}
+
+class Depends_onObject{
+}
+
+class Depends_onValue{
+  + value : STRING [1..*]
+}
+
+class EnvironmentValue{
+  + value : STRING [1..*]
+}
+
+Volume <|-- VolumeObject
+Volume <|-- VolumeValue
+Build <|-- BuildObject
+Build <|-- BuildValue
+Networks <|-- NetworksObject
+Networks <|-- NetworksValue
+Depends_on <|-- Depends_onObject
+Depends_on <|-- Depends_onValue
+Environment <|-- EnvironmentValue
+
+DockerCompose *--> "1..*" Service : services
+DockerCompose *--> "0..1" Networks : networks
+DockerCompose *--> "0..*" Volume : volumes
+DockerCompose *--> "0..*" Secret : secrets
+Service *--> "0..1" Build : build
+Service *--> "0..1" Environment : environment
+Service *--> "0..1" Healthcheck : healthcheck
+Service *--> "0..*" Resource : deploy
+Service *--> "0..1" Depends_on : depends_on
+Service *--> "0..*" Volume : volumes
+Service *--> "0..1" Networks : networks
+Network *--> "0..*" Config : ipam
+NetworksObject *--> "1..*" Network : network
+Depends_onObject *--> "1..1" Db : db
 
 @enduml

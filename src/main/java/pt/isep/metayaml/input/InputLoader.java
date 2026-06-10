@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class InputLoader {
     private final YamlFileDiscovery discovery;
@@ -19,6 +20,17 @@ public class InputLoader {
 
     /**
      * Loads all parseable YAML documents from the given DSL sources.
+     *
+     * <p>Documents are parsed faithfully: the shapes that actually appear in the
+     * YAML (scalars, scalar-lists, mappings, mapping-lists) are preserved as-is.
+     * When the same key appears in different shapes across documents — e.g.
+     * {@code on: [push, pull_request]} in one file and
+     * {@code on: { push: { ... } }} in another — the difference is reconciled later
+     * by the inference engine's general polymorphism rule
+     * ({@code R_PolymorphicFeatureRule}), which builds an abstract supertype with a
+     * {@code …Value} (the list/scalar shape) and a {@code …Object} (the mapping
+     * shape) subtype. This keeps the loader DSL-agnostic: no key-specific
+     * assumptions (such as "a list of names is shorthand for a map") are baked in.
      *
      * @param sources the configured DSL sources
      * @return all successfully parsed documents
@@ -34,25 +46,24 @@ public class InputLoader {
                         source.name(), source.directory());
                 continue;
             }
-            documents.addAll(parseFiles(source.name(), files));
-        }
-
-        return documents;
-    }
-
-    private List<ParsedDocument> parseFiles(String dslName, List<Path> files) {
-        List<ParsedDocument> results = new ArrayList<>();
-
-        for (Path file : files) {
-            try {
-                ParsedDocument doc = parser.parse(dslName, file);
-                results.add(doc);
-                System.out.printf("[INFO] Parsed: [%s] %s%n", dslName, file.getFileName());
-            } catch (YamlParseException e) {
-                System.out.printf("[WARN] Skipped '%s': %s%n", file.getFileName(), e.getMessage());
+            for (Path file : files) {
+                try {
+                    List<Map<String, Object>> roots = parser.parseToRootMaps(file);
+                    for (Map<String, Object> content : roots) {
+                        documents.add(new ParsedDocument(source.name(), file, content));
+                    }
+                    if (roots.size() > 1) {
+                        System.out.printf("[INFO] Parsed: [%s] %s (%d documents)%n",
+                                source.name(), file.getFileName(), roots.size());
+                    } else {
+                        System.out.printf("[INFO] Parsed: [%s] %s%n", source.name(), file.getFileName());
+                    }
+                } catch (YamlParseException e) {
+                    System.out.printf("[WARN] Skipped '%s': %s%n", file.getFileName(), e.getMessage());
+                }
             }
         }
 
-        return results;
+        return documents;
     }
 }

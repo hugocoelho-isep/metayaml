@@ -39,7 +39,7 @@ public class R3_ClassMergeRule implements IRefinementRule {
                 MetaClass metaClassB = classes.get(j);
 
                 if (arcMergeable(metaClassA, metaClassB)){
-                    merge(metaClassA, metaClassB,metamodel);
+                    merge(metaClassA, metaClassB, metamodel);
                     return true;
                 }
             }
@@ -48,16 +48,29 @@ public class R3_ClassMergeRule implements IRefinementRule {
     }
 
     private boolean arcMergeable(MetaClass metaClassA, MetaClass metaClassB){
+        // never merge across an inheritance hierarchy: abstract supertypes and their
+        // subtypes are intentionally distinct (e.g. EnvironmentValue and OnValue are
+        // structurally identical single-`value` classes but belong to different unions)
+        if(metaClassA.isAbstract() || metaClassB.isAbstract())
+            return false;
+        if(metaClassA.getSuperType() != null || metaClassB.getSuperType() != null)
+            return false;
+
         Set<String> attrsA = attributeNames(metaClassA);
         Set<String> attrsB = attributeNames(metaClassB);
         Set<String> refA = referenceNames(metaClassA);
         Set<String> refB = referenceNames(metaClassB);
 
-        // need at least one shared feature
+        // both must have at least one feature
         if(attrsA.isEmpty() && refA.isEmpty())
             return false;
         if(attrsB.isEmpty() && refB.isEmpty())
-            return true;
+            return false;
+
+        // a single shared feature is not enough evidence that two classes represent the same concept
+        // (e.g. Release{types} and Issues{types} are structurally equal but semantically distinct)
+        if(attrsA.size() + refA.size() < 2)
+            return false;
 
         return attrsA.equals(attrsB) && refA.equals(refB);
     }
@@ -76,6 +89,22 @@ public class R3_ClassMergeRule implements IRefinementRule {
             if(survivor.findAttribute(attr.getName()).isEmpty()){
                 attr.setOptional(true);
                 survivor.addAttribute(attr);
+            }
+        });
+
+        // reference in survivor but not in absorbed -> optional
+        Set<String> absorbedRefNames = referenceNames(absorbed);
+        survivor.getReferences().forEach(ref -> {
+            if(!absorbedRefNames.contains(ref.getName())){
+                ref.setOptional(true);
+            }
+        });
+
+        // reference in absorbed but not in survivor -> add as optional
+        absorbed.getReferences().forEach(ref -> {
+            if(survivor.findReference(ref.getName()).isEmpty()){
+                ref.setOptional(true);
+                survivor.addReference(ref);
             }
         });
 
