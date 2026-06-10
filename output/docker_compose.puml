@@ -17,6 +17,7 @@ class Service{
   + command : STRING [0..*]
   + stop_signal : STRING [0..1]
   + expose : INTEGER [0..*]
+  + secrets : STRING [0..*]
   + user : STRING [0..1]
   + hostname : STRING [0..1]
   + cap_add : STRING [0..*]
@@ -26,22 +27,12 @@ class Service{
   + platform : STRING [0..1]
   + runtime : STRING [0..1]
   + sysctls : STRING [0..*]
-  + environment : Map<String, String> [0..1]
 }
 
-class Build{
-  + context : STRING [1..1]
-  + target : STRING [0..1]
-  + args : STRING [0..*]
-  + dockerfile : STRING [0..1]
+abstract class Build{
 }
 
-class Volume{
-  + id : STRING [0..1]
-  + type : STRING [0..1]
-  + source : STRING [0..1]
-  + target : STRING [0..1]
-  + read_only : BOOLEAN [0..1]
+abstract class Environment{
 }
 
 class Healthcheck{
@@ -52,22 +43,16 @@ class Healthcheck{
   + timeout : STRING [0..1]
 }
 
+abstract class Networks{
+}
+
 class Network{
   + id : STRING [1..1]
   + driver : STRING [0..1]
   + ipv4_address : STRING [0..1]
 }
 
-class Depends_on{
-  + elasticsearch : STRING [0..1]
-  + redis : STRING [0..1]
-  + prometheus : STRING [0..1]
-  + backend : STRING [0..1]
-  + mongo : STRING [0..1]
-  + web1 : STRING [0..1]
-  + web2 : STRING [0..1]
-  + flask_app : STRING [0..1]
-  + cloudflared : STRING [0..1]
+abstract class Volume{
 }
 
 class Resource{
@@ -75,31 +60,86 @@ class Resource{
   + memory : STRING [1..1]
 }
 
-class Secret{
-  + id : STRING [1..1]
-  + file : STRING [0..1]
+abstract class Depends_on{
 }
 
 class Db{
-  + condition : STRING [0..1]
+  + condition : STRING [1..1]
+}
+
+class Secret{
+  + id : STRING [1..1]
+  + file : STRING [1..1]
 }
 
 class Config{
   + subnet : STRING [1..1]
 }
 
+class VolumeObject{
+  + id : STRING [0..1]
+  + type : STRING [0..1]
+  + source : STRING [0..1]
+  + target : STRING [0..1]
+  + read_only : BOOLEAN [0..1]
+}
+
+class VolumeValue{
+  + value : STRING [1..*]
+}
+
+class BuildObject{
+  + context : STRING [1..1]
+  + target : STRING [0..1]
+  + args : STRING [0..*]
+  + dockerfile : STRING [0..1]
+}
+
+class BuildValue{
+  + value : STRING [1..1]
+}
+
+class NetworksObject{
+}
+
+class NetworksValue{
+  + value : STRING [1..*]
+}
+
+class Depends_onObject{
+}
+
+class Depends_onValue{
+  + value : STRING [1..*]
+}
+
+class EnvironmentValue{
+  + value : STRING [1..*]
+}
+
+Volume <|-- VolumeObject
+Volume <|-- VolumeValue
+Build <|-- BuildObject
+Build <|-- BuildValue
+Networks <|-- NetworksObject
+Networks <|-- NetworksValue
+Depends_on <|-- Depends_onObject
+Depends_on <|-- Depends_onValue
+Environment <|-- EnvironmentValue
+
 DockerCompose *--> "1..*" Service : services
-DockerCompose *--> "0..*" Network : networks
+DockerCompose *--> "0..1" Networks : networks
 DockerCompose *--> "0..*" Volume : volumes
 DockerCompose *--> "0..*" Secret : secrets
 Service *--> "0..1" Build : build
-Service *--> "0..*" Volume : volumes
+Service *--> "0..1" Environment : environment
 Service *--> "0..1" Healthcheck : healthcheck
-Service *--> "0..*" Network : networks
-Service *--> "0..1" Depends_on : depends_on
 Service *--> "0..*" Resource : deploy
-Service *--> "0..*" Secret : secrets
+Service *--> "0..1" Depends_on : depends_on
+Service *--> "0..*" Volume : volumes
+Service *--> "0..1" Networks : networks
 Network *--> "0..*" Config : ipam
-Depends_on *--> "0..1" Db : db
+NetworksObject *--> "1..*" Network : network
+Depends_onObject *--> "1..1" Db : db
 
 @enduml

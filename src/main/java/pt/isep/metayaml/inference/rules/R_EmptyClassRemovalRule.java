@@ -34,6 +34,7 @@ public class R_EmptyClassRemovalRule implements IRefinementRule {
     public void apply(InferredMetamodel metamodel) {
         List<MetaClass> emptyClasses = metamodel.getClasses().stream()
                 .filter(c -> c.getAttributes().isEmpty() && c.getReferences().isEmpty())
+                .filter(c -> !c.isAbstract()) // abstract union supertypes are intentionally empty
                 .toList();
 
         for (MetaClass empty : emptyClasses) {

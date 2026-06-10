@@ -33,7 +33,7 @@ public class MetamodelInferenceEngine implements IRuleEngine {
         ); // The list of order must be on this order
 
        this.refinementRules = List.of(
-               new R_FeatureConflictRule(),      // remove attr/ref duplicates
+               new R_PolymorphicFeatureRule(),    // scalar+object conflicts -> abstract + 2 subtypes
                new R1_OptionalRule(),             // mark optional by occurrence count
                new R_SharedClassOptionalRule(),   // shared classes are always optional
                new R2_TypeRefinementRule(),        // refine NULL types

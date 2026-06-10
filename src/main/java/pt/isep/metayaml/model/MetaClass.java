@@ -24,6 +24,8 @@ public class MetaClass {
     private final List<MetaAttribute> attributes;
     private final List<MetaReference> references;
     private int occurrences; // how many times seen across documents
+    private boolean isAbstract;   // true for inferred union supertypes (cannot be instantiated)
+    private MetaClass superType;  // single-inheritance parent, null when none
 
     public MetaClass(String name) {
         if(name == null || name.isBlank()){
@@ -33,6 +35,8 @@ public class MetaClass {
         this.attributes  = new ArrayList<>();
         this.references  = new ArrayList<>();
         this.occurrences = 0;
+        this.isAbstract  = false;
+        this.superType   = null;
     }
 
 
@@ -78,6 +82,13 @@ public class MetaClass {
     // Occurrence tracking, using in refinement rule
     public int getOccurrences() {return occurrences; }
     public void incrementOccurrences(){ this.occurrences++; }
+
+    // Inheritance (used by the polymorphic-feature rule and the exporters)
+    public boolean isAbstract(){ return isAbstract; }
+    public void setAbstract(boolean isAbstract){ this.isAbstract = isAbstract; }
+
+    public MetaClass getSuperType(){ return superType; }
+    public void setSuperType(MetaClass superType){ this.superType = superType; }
 
     // Getters
     public String getName(){ return name; }

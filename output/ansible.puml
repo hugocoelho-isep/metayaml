@@ -4,8 +4,8 @@ skinparam classAttributeIconSize 0
 skinparam classFontStyle bold
 
 class Ansible{
-  + hosts : STRING [0..1]
   + become : BOOLEAN [0..1]
+  + hosts : STRING [0..1]
   + name : STRING [0..1]
   + serial : INTEGER [0..1]
   + vars_files : STRING [0..*]
@@ -13,54 +13,6 @@ class Ansible{
   + connection : STRING [0..1]
   + remote_user : STRING [0..1]
   + import_playbook : STRING [0..1]
-}
-
-class Task{
-  + name : STRING [0..1]
-  + command : STRING [0..1]
-  + become_user : STRING [0..1]
-  + register : STRING [0..1]
-  + loop : STRING [0..1]
-  + notify : STRING [0..1]
-  + become : BOOLEAN [0..1]
-  + when : STRING [0..1]
-  + environment : STRING [0..1]
-  + npm : STRING [0..1]
-  + changed_when : BOOLEAN [0..1]
-  + import_tasks : STRING [0..1]
-  + shell : STRING [0..1]
-  + apt_repository : STRING [0..1]
-  + apache2_module : STRING [0..1]
-  + mysql_db : STRING [0..1]
-  + run_once : BOOLEAN [0..1]
-  + async : INTEGER [0..1]
-  + poll : INTEGER [0..1]
-  + raw : STRING [0..1]
-  + delegate_to : STRING [0..1]
-  + with_indexed_items : STRING [0..1]
-  + wait_for_connection : STRING [0..1]
-}
-
-class File{
-  + path : STRING [1..1]
-  + state : STRING [0..1]
-  + owner : STRING [0..1]
-  + mode : STRING [0..1]
-  + group : STRING [0..1]
-  + recurse : BOOLEAN [0..1]
-}
-
-class Archive{
-  + path : STRING [1..1]
-  + dest : STRING [1..1]
-  + format : STRING [1..1]
-  + remove : BOOLEAN [1..1]
-}
-
-class Find{
-  + paths : STRING [1..1]
-  + age : STRING [1..1]
-  + patterns : STRING [1..1]
 }
 
 class Vars{
@@ -92,26 +44,50 @@ class Vars{
   + ansible_python_interpreter : STRING [0..1]
 }
 
+class Task{
+  + name : STRING [0..1]
+  + command : STRING [0..1]
+  + become_user : STRING [0..1]
+  + register : STRING [0..1]
+  + loop : STRING [0..1]
+  + notify : STRING [0..1]
+  + become : BOOLEAN [0..1]
+  + when : STRING [0..1]
+  + environment : STRING [0..1]
+  + npm : STRING [0..1]
+  + changed_when : BOOLEAN [0..1]
+  + import_tasks : STRING [0..1]
+  + shell : STRING [0..1]
+  + apt_repository : STRING [0..1]
+  + apache2_module : STRING [0..1]
+  + mysql_db : STRING [0..1]
+  + run_once : BOOLEAN [0..1]
+  + async : INTEGER [0..1]
+  + poll : INTEGER [0..1]
+  + raw : STRING [0..1]
+  + delegate_to : STRING [0..1]
+  + with_indexed_items : STRING [0..1]
+  + wait_for_connection : STRING [0..1]
+}
+
+abstract class File{
+}
+
+class Archive{
+  + path : STRING [1..1]
+  + dest : STRING [1..1]
+  + format : STRING [1..1]
+  + remove : BOOLEAN [1..1]
+}
+
+class Find{
+  + paths : STRING [1..1]
+  + age : STRING [1..1]
+  + patterns : STRING [1..1]
+}
+
 class Assert{
   + that : STRING [1..1]
-}
-
-class Pause{
-  + seconds : INTEGER [1..1]
-}
-
-class Pre_task{
-  + name : STRING [1..1]
-  + delegate_to : STRING [0..1]
-  + with_items : STRING [0..1]
-  + service : STRING [0..1]
-}
-
-class Haproxy{
-  + state : STRING [1..1]
-  + host : STRING [1..1]
-  + socket : STRING [1..1]
-  + backend : STRING [1..1]
 }
 
 class Post_task{
@@ -127,6 +103,24 @@ class Wait_for{
   + port : INTEGER [1..1]
   + state : STRING [1..1]
   + timeout : INTEGER [1..1]
+}
+
+class Haproxy{
+  + state : STRING [1..1]
+  + host : STRING [1..1]
+  + socket : STRING [1..1]
+  + backend : STRING [1..1]
+}
+
+class Pre_task{
+  + name : STRING [1..1]
+  + delegate_to : STRING [0..1]
+  + with_items : STRING [0..1]
+  + service : STRING [0..1]
+}
+
+class Pause{
+  + seconds : INTEGER [1..1]
 }
 
 class Git{
@@ -145,11 +139,7 @@ class Template{
   + mode : INTEGER [0..1]
 }
 
-class Apt{
-  + name : STRING [0..*]
-  + state : STRING [0..1]
-  + update_cache : BOOLEAN [0..1]
-  + cache_valid_time : INTEGER [0..1]
+abstract class Apt{
 }
 
 class Cron{
@@ -165,11 +155,7 @@ class Handler{
   + import_tasks : STRING [0..1]
 }
 
-class Role{
-  + role : STRING [0..1]
-  + name : STRING [0..1]
-  + delegate_to : STRING [0..1]
-  + tags : STRING [0..*]
+abstract class Role{
 }
 
 class Set_fact{
@@ -177,27 +163,20 @@ class Set_fact{
   + mysql_replication_master : STRING [0..1]
 }
 
-class Copy{
-  + src : STRING [0..1]
-  + dest : STRING [1..1]
-  + mode : STRING [0..1]
-  + owner : STRING [0..1]
-  + group : STRING [0..1]
-  + force : BOOLEAN [0..1]
-  + content : STRING [0..1]
-}
-
-class Docker_container{
-  + name : STRING [1..1]
-  + state : STRING [0..1]
-  + image : STRING [0..1]
-  + command : STRING [0..1]
+abstract class Copy{
 }
 
 class Docker_image{
   + name : STRING [1..1]
   + source : STRING [1..1]
   + force_source : BOOLEAN [0..1]
+  + state : STRING [0..1]
+}
+
+class Docker_container{
+  + image : STRING [0..1]
+  + name : STRING [1..1]
+  + command : STRING [0..1]
   + state : STRING [0..1]
 }
 
@@ -242,8 +221,7 @@ class Get_url{
   + checksum : STRING [0..1]
 }
 
-class Stat{
-  + path : STRING [1..1]
+abstract class Stat{
 }
 
 class Composer{
@@ -265,16 +243,10 @@ class Digital_ocean_droplet{
   + image : STRING [0..1]
 }
 
-class Dnf{
-  + name : STRING [1..*]
-  + state : STRING [1..1]
-  + enablerepo : STRING [0..1]
+abstract class Dnf{
 }
 
-class Service{
-  + name : STRING [1..1]
-  + state : STRING [1..1]
-  + enabled : BOOLEAN [0..1]
+abstract class Service{
 }
 
 class Gluster_volume{
@@ -335,8 +307,7 @@ class Community.kubernetes.k8s{
   + namespace : STRING [1..1]
 }
 
-class Debug{
-  + var : STRING [1..1]
+abstract class Debug{
 }
 
 class K8s{
@@ -347,9 +318,7 @@ class K8s{
   + name : STRING [0..1]
 }
 
-class Definition{
-  + apiVersion : STRING [1..1]
-  + kind : STRING [1..1]
+abstract class Definition{
 }
 
 class Metadata{
@@ -387,6 +356,23 @@ class Seboolean{
   + persistent : BOOLEAN [1..1]
 }
 
+class Instance{
+  + name : STRING [1..1]
+  + group : STRING [1..1]
+  + security_group : STRING [1..*]
+}
+
+class Security_group{
+  + name : STRING [1..1]
+}
+
+class Rule{
+  + proto : STRING [1..1]
+  + from_port : INTEGER [1..1]
+  + to_port : INTEGER [1..1]
+  + cidr_ip : STRING [1..1]
+}
+
 class Ec2_group{
   + name : STRING [1..1]
   + description : STRING [1..1]
@@ -420,23 +406,6 @@ class Count_tag{
   + inventory_host : STRING [1..1]
 }
 
-class Instance{
-  + name : STRING [1..1]
-  + group : STRING [1..1]
-  + security_group : STRING [1..*]
-}
-
-class Security_group{
-  + name : STRING [1..1]
-}
-
-class Rule{
-  + proto : STRING [1..1]
-  + from_port : INTEGER [1..1]
-  + to_port : INTEGER [1..1]
-  + cidr_ip : STRING [1..1]
-}
-
 class Droplet{
   + name : STRING [1..1]
   + group : STRING [1..1]
@@ -454,11 +423,7 @@ class Seport{
   + state : STRING [1..1]
 }
 
-class With_item{
-  + regexp : STRING [0..1]
-  + line : STRING [0..1]
-  + state : STRING [0..1]
-  + port : STRING [0..1]
+abstract class With_item{
 }
 
 class User{
@@ -481,12 +446,147 @@ class Selinux{
   + state : STRING [1..1]
 }
 
-Ansible *--> "0..*" Task : tasks
+class Systemd{
+  + name : STRING [1..1]
+  + state : STRING [1..1]
+  + enabled : BOOLEAN [1..1]
+}
+
+class RoleObject{
+  + role : STRING [0..1]
+  + name : STRING [0..1]
+  + delegate_to : STRING [0..1]
+  + tags : STRING [0..*]
+}
+
+class RoleValue{
+  + value : STRING [1..*]
+}
+
+class StatObject{
+  + path : STRING [1..1]
+}
+
+class StatValue{
+  + value : STRING [1..1]
+}
+
+class With_itemObject{
+  + regexp : STRING [0..1]
+  + line : STRING [0..1]
+  + state : STRING [0..1]
+  + port : STRING [0..1]
+}
+
+class With_itemValue{
+  + value : STRING [1..*]
+}
+
+class ServiceObject{
+  + name : STRING [1..1]
+  + state : STRING [1..1]
+  + enabled : BOOLEAN [0..1]
+}
+
+class ServiceValue{
+  + value : STRING [1..1]
+}
+
+class DnfObject{
+  + name : STRING [1..*]
+  + state : STRING [1..1]
+  + enablerepo : STRING [0..1]
+}
+
+class DnfValue{
+  + value : STRING [1..1]
+}
+
+class DebugObject{
+  + var : STRING [1..1]
+}
+
+class DebugValue{
+  + value : STRING [1..1]
+}
+
+class FileObject{
+  + path : STRING [1..1]
+  + state : STRING [0..1]
+  + owner : STRING [0..1]
+  + mode : STRING [0..1]
+  + group : STRING [0..1]
+  + recurse : BOOLEAN [0..1]
+}
+
+class FileValue{
+  + value : STRING [1..1]
+}
+
+class CopyObject{
+  + src : STRING [0..1]
+  + dest : STRING [1..1]
+  + mode : STRING [0..1]
+  + owner : STRING [0..1]
+  + group : STRING [0..1]
+  + force : BOOLEAN [0..1]
+  + content : STRING [0..1]
+}
+
+class CopyValue{
+  + value : STRING [1..1]
+}
+
+class AptObject{
+  + name : STRING [0..*]
+  + state : STRING [0..1]
+  + update_cache : BOOLEAN [0..1]
+  + cache_valid_time : INTEGER [0..1]
+}
+
+class AptValue{
+  + value : STRING [1..1]
+}
+
+class DefinitionObject{
+  + apiVersion : STRING [1..1]
+  + kind : STRING [1..1]
+}
+
+class DefinitionValue{
+  + value : STRING [1..1]
+}
+
+Role <|-- RoleObject
+Role <|-- RoleValue
+Stat <|-- StatObject
+Stat <|-- StatValue
+With_item <|-- With_itemObject
+With_item <|-- With_itemValue
+Service <|-- ServiceObject
+Service <|-- ServiceValue
+Dnf <|-- DnfObject
+Dnf <|-- DnfValue
+Debug <|-- DebugObject
+Debug <|-- DebugValue
+File <|-- FileObject
+File <|-- FileValue
+Copy <|-- CopyObject
+Copy <|-- CopyValue
+Apt <|-- AptObject
+Apt <|-- AptValue
+Definition <|-- DefinitionObject
+Definition <|-- DefinitionValue
+
 Ansible *--> "0..1" Vars : vars
-Ansible *--> "0..*" Pre_task : pre_tasks
+Ansible *--> "0..*" Task : tasks
 Ansible *--> "0..*" Post_task : post_tasks
+Ansible *--> "0..*" Pre_task : pre_tasks
 Ansible *--> "0..*" Handler : handlers
 Ansible *--> "0..*" Role : roles
+Vars *--> "0..*" Instance : instances
+Vars *--> "0..*" Security_group : security_groups
+Vars *--> "0..*" Droplet : droplets
 Task *--> "0..1" File : file
 Task *--> "0..1" Archive : archive
 Task *--> "0..1" Find : find
@@ -531,10 +631,10 @@ Task *--> "0..*" With_item : with_items
 Task *--> "0..1" User : user
 Task *--> "0..1" Firewalld : firewalld
 Task *--> "0..1" Selinux : selinux
-Task *--> "0..1" Service : systemd
-Vars *--> "0..*" Instance : instances
-Vars *--> "0..*" Security_group : security_groups
-Vars *--> "0..*" Droplet : droplets
+Task *--> "0..1" Systemd : systemd
+Post_task *--> "0..1" Wait_for : wait_for
+Post_task *--> "0..1" Haproxy : haproxy
+Post_task *--> "0..1" Docker_container : docker_container
 Pre_task *--> "0..1" Haproxy : haproxy
 Pre_task *--> "0..1" Docker_image : docker_image
 Pre_task *--> "0..1" Docker_container : docker_container
@@ -546,20 +646,17 @@ Pre_task *--> "0..1" Copy : copy
 Pre_task *--> "0..1" Set_fact : set_fact
 Pre_task *--> "0..1" Rpm_key : rpm_key
 Pre_task *--> "0..1" Dnf : dnf
-Post_task *--> "0..1" Wait_for : wait_for
-Post_task *--> "0..1" Haproxy : haproxy
-Post_task *--> "0..1" Docker_container : docker_container
 Set_fact *--> "0..*" Mysql_user : mysql_users
 Docker_image *--> "0..1" Build : build
 Community.kubernetes.helm *--> "0..*" Value : values
 K8s *--> "0..1" Definition : definition
-Definition *--> "1..1" Metadata : metadata
-Definition *--> "1..1" Spec : spec
 Metadata *--> "1..1" Labels : labels
 Spec *--> "1..*" Port : ports
 Spec *--> "1..1" Selector : selector
+Security_group *--> "1..*" Rule : rules
 Ec2 *--> "1..1" Instance_tags : instance_tags
 Ec2 *--> "1..1" Count_tag : count_tag
-Security_group *--> "1..*" Rule : rules
+DefinitionObject *--> "1..1" Metadata : metadata
+DefinitionObject *--> "1..1" Spec : spec
 
 @enduml

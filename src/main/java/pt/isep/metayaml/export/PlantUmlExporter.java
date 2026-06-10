@@ -34,12 +34,24 @@ public class PlantUmlExporter implements IMetamodelExporter{
 
         // class definition
         for(MetaClass metaClass: metamodel.getClasses()){
-            sb.append("class ").append(metaClass.getName()).append("{\n");
+            sb.append(metaClass.isAbstract() ? "abstract class " : "class ");
+            sb.append(metaClass.getName()).append("{\n");
             for(MetaAttribute attr: metaClass.getAttributes()){
                 sb.append("  ").append(formatAttribute(attr)).append("\n");
             }
             sb.append("}\n\n");
         }
+
+        // inheritance (supertype <|-- subtype)
+        for(MetaClass metaClass: metamodel.getClasses()){
+            if(metaClass.getSuperType() != null){
+                sb.append(metaClass.getSuperType().getName())
+                        .append(" <|-- ")
+                        .append(metaClass.getName())
+                        .append("\n");
+            }
+        }
+        sb.append("\n");
 
         // relationships
         for(MetaClass metaClass: metamodel.getClasses()){

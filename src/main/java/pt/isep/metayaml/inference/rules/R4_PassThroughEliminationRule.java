@@ -66,6 +66,8 @@ public class R4_PassThroughEliminationRule implements IRefinementRule {
 
     private boolean isPassThrough(MetaClass cls) {
         return !PROTECTED_NAMES.contains(cls.getName())
+                && !cls.isAbstract()              // keep union supertypes
+                && cls.getSuperType() == null     // keep union subtypes
                 && cls.getAttributes().isEmpty()
                 && cls.getReferences().size() == 1
                 && cls.getReferences().get(0).isMany()

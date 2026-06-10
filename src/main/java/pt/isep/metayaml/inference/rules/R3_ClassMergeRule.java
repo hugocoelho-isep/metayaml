@@ -48,6 +48,14 @@ public class R3_ClassMergeRule implements IRefinementRule {
     }
 
     private boolean arcMergeable(MetaClass metaClassA, MetaClass metaClassB){
+        // never merge across an inheritance hierarchy: abstract supertypes and their
+        // subtypes are intentionally distinct (e.g. EnvironmentValue and OnValue are
+        // structurally identical single-`value` classes but belong to different unions)
+        if(metaClassA.isAbstract() || metaClassB.isAbstract())
+            return false;
+        if(metaClassA.getSuperType() != null || metaClassB.getSuperType() != null)
+            return false;
+
         Set<String> attrsA = attributeNames(metaClassA);
         Set<String> attrsB = attributeNames(metaClassB);
         Set<String> refA = referenceNames(metaClassA);

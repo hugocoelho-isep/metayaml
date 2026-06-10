@@ -56,7 +56,9 @@ public class EcoreExporter implements IMetamodelExporter{
         ePackage.setNsPrefix(sanitize(metamodel.getDslName()));
         ePackage.setNsURI(BASE_NS_URI + sanitize(metamodel.getDslName()));
 
-        // create shared KeyValuePair EClass for open-map attributes
+        // create shared KeyValuePair EClass for open-map attributes;
+        // key is mandatory (a map entry always has a key) but value is optional
+        // because YAML map values can legitimately be empty (with:, env:, outputs:, labels:)
         EClass kvClass = factory.createEClass();
         kvClass.setName("KeyValuePair");
 
@@ -70,25 +72,30 @@ public class EcoreExporter implements IMetamodelExporter{
         EAttribute valueAttr = factory.createEAttribute();
         valueAttr.setName("value");
         valueAttr.setEType(EcorePackage.eINSTANCE.getEString());
-        valueAttr.setLowerBound(1);
+        valueAttr.setLowerBound(0);
         valueAttr.setUpperBound(1);
         kvClass.getEStructuralFeatures().add(valueAttr);
 
         ePackage.getEClassifiers().add(kvClass);
         this.keyValuePairClass = kvClass;
 
-        // pass 1: create all Eclasses first (needed for cross-references)
+        // pass 1: create all Eclasses first (needed for cross-references and supertypes)
         Map<String, EClass> eClassMap = new HashMap<>();
         for (MetaClass metaClass: metamodel.getClasses()){
             EClass eClass = factory.createEClass();
             eClass.setName(metaClass.getName());
+            eClass.setAbstract(metaClass.isAbstract());
             ePackage.getEClassifiers().add(eClass);
             eClassMap.put(metaClass.getName(), eClass);
         }
 
-        // pass 2: add attributes and references
+        // pass 2: wire supertypes, attributes and references
         for(MetaClass metaClass: metamodel.getClasses()){
             EClass eClass = eClassMap.get(metaClass.getName());
+            if (metaClass.getSuperType() != null) {
+                EClass superEClass = eClassMap.get(metaClass.getSuperType().getName());
+                if (superEClass != null) eClass.getESuperTypes().add(superEClass);
+            }
             addAttributes(metaClass, eClass, factory);
             addReferences(metaClass, eClass, factory, eClassMap);
         }

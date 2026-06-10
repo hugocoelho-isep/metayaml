@@ -8,8 +8,7 @@ class GithubActions{
   + env : Map<String, String> [0..1]
 }
 
-class On{
-  + branch_protection_rule : STRING [0..1]
+abstract class On{
 }
 
 class Push{
@@ -29,8 +28,8 @@ class Job{
   + needs : STRING [0..*]
   + if : STRING [0..1]
   + uses : STRING [0..1]
-  + env : Map<String, String> [0..1]
   + with : Map<String, String> [0..1]
+  + env : Map<String, String> [0..1]
   + outputs : Map<String, String> [0..1]
 }
 
@@ -44,21 +43,11 @@ class Step{
   + shell : STRING [0..1]
   + continue_on_error : BOOLEAN [0..1]
   + timeout_minutes : INTEGER [0..1]
-  + env : Map<String, String> [0..1]
   + with : Map<String, String> [0..1]
+  + env : Map<String, String> [0..1]
 }
 
-class Permissions{
-  + contents : STRING [0..1]
-  + security_events : STRING [0..1]
-  + actions : STRING [0..1]
-  + pages : STRING [0..1]
-  + id_token : STRING [0..1]
-  + pull_requests : STRING [0..1]
-  + issues : STRING [0..1]
-  + packages : STRING [0..1]
-  + models : STRING [0..1]
-  + checks : STRING [0..1]
+abstract class Permissions{
 }
 
 class Schedule{
@@ -68,14 +57,12 @@ class Schedule{
 class Workflow_dispatch{
 }
 
-class Environment{
-  + name : STRING [1..1]
-  + url : STRING [0..1]
-}
-
 class Concurrency{
   + group : STRING [1..1]
   + cancel_in_progress : BOOLEAN [1..1]
+}
+
+abstract class Environment{
 }
 
 class Strategy{
@@ -83,7 +70,7 @@ class Strategy{
   + max_parallel : INTEGER [0..1]
 }
 
-class Matrix{
+abstract class Matrix{
 }
 
 class Include{
@@ -117,10 +104,6 @@ class Release{
   + types : STRING [1..*]
 }
 
-class Issues{
-  + types : STRING [0..*]
-}
-
 class Input{
   + id : STRING [1..1]
   + description : STRING [1..1]
@@ -140,25 +123,70 @@ class Service{
   + env : Map<String, String> [0..1]
 }
 
+class Issues{
+  + types : STRING [1..*]
+}
+
+class PermissionsObject{
+  + contents : STRING [0..1]
+  + security_events : STRING [0..1]
+  + actions : STRING [0..1]
+  + pages : STRING [0..1]
+  + id_token : STRING [0..1]
+  + pull_requests : STRING [0..1]
+  + issues : STRING [0..1]
+  + packages : STRING [0..1]
+  + models : STRING [0..1]
+  + checks : STRING [0..1]
+}
+
+class PermissionsValue{
+  + value : STRING [1..1]
+}
+
+class OnObject{
+  + branch_protection_rule : STRING [0..1]
+}
+
+class OnValue{
+  + value : STRING [1..*]
+}
+
+class EnvironmentObject{
+  + name : STRING [1..1]
+  + url : STRING [0..1]
+}
+
+class EnvironmentValue{
+  + value : STRING [1..1]
+}
+
+class MatrixObject{
+}
+
+class MatrixValue{
+  + value : STRING [1..1]
+}
+
 class MatrixParameter{
   + key : STRING [1..1]
   + values : STRING [1..*]
 }
+
+Permissions <|-- PermissionsObject
+Permissions <|-- PermissionsValue
+On <|-- OnObject
+On <|-- OnValue
+Environment <|-- EnvironmentObject
+Environment <|-- EnvironmentValue
+Matrix <|-- MatrixObject
+Matrix <|-- MatrixValue
 
 GithubActions *--> "1..1" On : on
 GithubActions *--> "1..*" Job : jobs
 GithubActions *--> "0..1" Permissions : permissions
 GithubActions *--> "0..1" Concurrency : concurrency
 GithubActions *--> "0..1" Defaults : defaults
-On *--> "0..1" Push : push
-On *--> "0..1" Pull_request : pull_request
-On *--> "0..*" Schedule : schedule
-On *--> "0..1" Workflow_dispatch : workflow_dispatch
-On *--> "0..1" Workflow_call : workflow_call
-On *--> "0..1" Pull_request : pull_request_target
-On *--> "0..1" Release : release
-On *--> "0..1" Issues : issues
-On *--> "0..1" Merge_group : merge_group
 Job *--> "0..*" Step : steps
 Job *--> "0..1" Permissions : permissions
 Job *--> "0..1" Environment : environment
@@ -168,10 +196,19 @@ Job *--> "0..*" Service : services
 Job *--> "0..1" Defaults : defaults
 Workflow_dispatch *--> "0..*" Input : inputs
 Strategy *--> "0..1" Matrix : matrix
-Matrix *--> "0..*" Include : include
-Matrix *--> "0..*" Exclude : exclude
-Matrix *--> "0..*" MatrixParameter : parameters
 Workflow_call *--> "1..*" Secret : secrets
 Defaults *--> "1..1" Run : run
+OnObject *--> "0..1" Push : push
+OnObject *--> "0..1" Pull_request : pull_request
+OnObject *--> "0..*" Schedule : schedule
+OnObject *--> "0..1" Workflow_dispatch : workflow_dispatch
+OnObject *--> "0..1" Workflow_call : workflow_call
+OnObject *--> "0..1" Pull_request : pull_request_target
+OnObject *--> "0..1" Release : release
+OnObject *--> "0..1" Merge_group : merge_group
+OnObject *--> "0..1" Issues : issues
+MatrixObject *--> "0..*" Include : include
+MatrixObject *--> "0..*" Exclude : exclude
+MatrixObject *--> "0..*" MatrixParameter : parameters
 
 @enduml
