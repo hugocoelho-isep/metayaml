@@ -77,10 +77,10 @@ public class YamlParser {
      * Parses the given YAML file into one or more root mappings.
      *
      * <p>Most configuration formats (e.g. GitHub Actions, Docker Compose) have a
-     * single mapping at the top level. Some formats — notably Ansible playbooks —
-     * use a top-level sequence whose elements are mappings (a list of "plays"). In
-     * that case each element is returned as a separate root mapping, so the
-     * inference engine treats every play as an independent document of the same DSL.
+     * single mapping at the top level. Some formats use a top-level sequence whose
+     * elements are mappings. In that case each element is returned as a separate
+     * root mapping, so the inference engine treats every element as an independent
+     * document of the same DSL.
      *
      * @param filePath path to the YAML file
      * @return one root mapping for a mapping-rooted file, or one per element for a

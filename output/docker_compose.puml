@@ -27,12 +27,10 @@ class Service{
   + platform : STRING [0..1]
   + runtime : STRING [0..1]
   + sysctls : STRING [0..*]
+  + environment : Map<String, String> [0..1]
 }
 
 abstract class Build{
-}
-
-abstract class Environment{
 }
 
 class Healthcheck{
@@ -60,16 +58,16 @@ class Resource{
   + memory : STRING [1..1]
 }
 
+class Secret{
+  + id : STRING [1..1]
+  + file : STRING [1..1]
+}
+
 abstract class Depends_on{
 }
 
 class Db{
   + condition : STRING [1..1]
-}
-
-class Secret{
-  + id : STRING [1..1]
-  + file : STRING [1..1]
 }
 
 class Config{
@@ -113,10 +111,6 @@ class Depends_onValue{
   + value : STRING [1..*]
 }
 
-class EnvironmentValue{
-  + value : STRING [1..*]
-}
-
 Volume <|-- VolumeObject
 Volume <|-- VolumeValue
 Build <|-- BuildObject
@@ -125,14 +119,12 @@ Networks <|-- NetworksObject
 Networks <|-- NetworksValue
 Depends_on <|-- Depends_onObject
 Depends_on <|-- Depends_onValue
-Environment <|-- EnvironmentValue
 
 DockerCompose *--> "1..*" Service : services
 DockerCompose *--> "0..1" Networks : networks
 DockerCompose *--> "0..*" Volume : volumes
 DockerCompose *--> "0..*" Secret : secrets
 Service *--> "0..1" Build : build
-Service *--> "0..1" Environment : environment
 Service *--> "0..1" Healthcheck : healthcheck
 Service *--> "0..*" Resource : deploy
 Service *--> "0..1" Depends_on : depends_on

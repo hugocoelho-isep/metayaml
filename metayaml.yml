@@ -4,5 +4,3 @@ sources:
     directory: ./samples/github-actions
   - name: docker-compose
     directory: ./samples/docker-compose
-  - name: ansible
-    directory: ./samples/ansible

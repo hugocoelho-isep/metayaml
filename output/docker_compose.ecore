@@ -46,8 +46,6 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="build" eType="#//Build"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="environment" eType="#//Environment"
-        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="healthcheck" eType="#//Healthcheck"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="deploy" upperBound="-1"
@@ -58,9 +56,10 @@
         eType="#//Volume" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="networks" eType="#//Networks"
         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="environment" upperBound="-1"
+        eType="#//KeyValuePair" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Build" abstract="true"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Environment" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Healthcheck">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="test" lowerBound="1" upperBound="-1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -85,14 +84,14 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="memory" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Secret">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Depends_on" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Db">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Secret">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Config">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="subnet" lowerBound="1"
@@ -132,10 +131,6 @@
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Depends_onValue" eSuperTypes="#//Depends_on">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" upperBound="-1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="EnvironmentValue" eSuperTypes="#//Environment">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" upperBound="-1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>

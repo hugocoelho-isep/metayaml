@@ -16,7 +16,6 @@ import java.util.Optional;
  * <ul>
  *   <li>GitHub Actions: {@code Workflow}, {@code Job}, {@code Step}
  *   <li>Docker Compose: {@code Service}, {@code Volume}, {@code Healthcheck}
- *   <li>Ansible: {@code Play}, {@code Task}
  * </ul>
  */
 public class MetaClass {
