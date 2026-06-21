@@ -10,8 +10,8 @@ import pt.isep.metayaml.model.MetaClass;
  * every occurrence of its owner class. If a class was encountered N times but
  * a feature appeared fewer than N times, the feature is marked optional.
  *
- * <p>Example — {@code Task} in Ansible is seen 10 times. {@code archive}
- * was seen only 1 time → {@code archive} becomes {@code [0..1]}.
+ * <p>Example — {@code Step} in GitHub Actions is seen 10 times. {@code with}
+ * was seen only 1 time → {@code with} becomes {@code [0..1]}.
  */
 public class R1_OptionalRule implements IRefinementRule{
     @Override

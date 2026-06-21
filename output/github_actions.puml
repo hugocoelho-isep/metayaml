@@ -57,12 +57,12 @@ class Schedule{
 class Workflow_dispatch{
 }
 
+abstract class Environment{
+}
+
 class Concurrency{
   + group : STRING [1..1]
   + cancel_in_progress : BOOLEAN [1..1]
-}
-
-abstract class Environment{
 }
 
 class Strategy{

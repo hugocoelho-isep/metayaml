@@ -21,18 +21,6 @@ originals; only the file names were changed to guarantee uniqueness.
 
 Plus **2** pre-existing hand-authored examples (`monitoring.yml`, `webapp.yml`).
 
-## Ansible (`ansible/`) — 58 files
-
-| Source | Detail |
-|--------|--------|
-| Repository | [geerlingguy/ansible-for-devops](https://github.com/geerlingguy/ansible-for-devops) |
-| Commit | `86e1bf8` |
-| Licence | **MIT** (© 2014 Jeff Geerling) |
-| Collected | 56 files — every `.yml` / `.yaml` containing a top-level `- hosts:` play (playbook heuristic) |
-| Naming | source-relative path with separators replaced by `-`, e.g. `deployments/playbooks/deploy.yml` → `deployments-playbooks-deploy.yml` |
-
-Plus **2** pre-existing hand-authored examples (`backup-database.yml`, `setup-webserver.yml`).
-
 ## GitHub Actions (`github-actions/`) — 179 files
 
 | Source | Detail |
@@ -45,6 +33,5 @@ Plus **2** pre-existing hand-authored examples (`backup-database.yml`, `setup-we
 
 ## Licensing notes
 - **CC0 1.0** imposes no attribution requirement; the source is credited here as good practice.
-- **MIT** requires retention of the copyright notice — recorded above (© 2014 Jeff Geerling).
 - Re-running `./gradlew run` over these corpora regenerates the `.ecore` and `.puml`
-  outputs in `output/` for all three domains.
+  outputs in `output/` for both domains.
