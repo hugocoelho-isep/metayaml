@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * R — Empty class removal rule.
+ * R5 — Empty class removal rule.
  *
  * <p>An empty class has no attributes and no references. These arise when a
  * YAML scalar is parsed as a mapping by SnakeYAML in some edge cases (e.g.
  * a string containing {@code :} being interpreted as a mapping key), causing
- * C1 to create a class with no content.
+ * C2 to create a class with no content.
  *
  * <p>For each empty class, every reference pointing to it is replaced by a
  * plain {@code STRING} attribute with the same name. The empty class is then
@@ -28,7 +28,7 @@ import java.util.List;
  *   after:  With.group_id : STRING [0..1]
  * </pre>
  */
-public class R_EmptyClassRemovalRule implements IRefinementRule {
+public class R5_EmptyClassRemovalRule implements IRefinementRule {
 
     @Override
     public void apply(InferredMetamodel metamodel) {
@@ -40,7 +40,7 @@ public class R_EmptyClassRemovalRule implements IRefinementRule {
         for (MetaClass empty : emptyClasses) {
             replaceReferencesWithAttribute(empty, metamodel);
             metamodel.removeClass(empty);
-            System.out.printf("[INFO] R_Empty: removed empty class '%s'%n", empty.getName());
+            System.out.printf("[INFO] R5_Empty: removed empty class '%s'%n", empty.getName());
         }
     }
 
@@ -55,7 +55,7 @@ public class R_EmptyClassRemovalRule implements IRefinementRule {
                 if (cls.findAttribute(ref.getName()).isEmpty()) {
                     cls.addAttribute(new MetaAttribute(ref.getName(), DataType.STRING, true, ref.isMany()));
                 }
-                System.out.printf("[INFO] R_Empty: replaced '%s.%s --> %s' with STRING attribute%n",
+                System.out.printf("[INFO] R5_Empty: replaced '%s.%s --> %s' with STRING attribute%n",
                         cls.getName(), ref.getName(), empty.getName());
             }
         }

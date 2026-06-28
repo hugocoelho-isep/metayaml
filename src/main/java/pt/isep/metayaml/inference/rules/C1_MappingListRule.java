@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * C4 — Mapping list rule.
+ * C1 — Mapping list rule.
  *
  * <p>When a YAML key maps to a list whose elements are mappings (objects),
  * a new {@link MetaClass} is created and a containment {@link MetaReference}
@@ -22,7 +22,7 @@ import java.util.Map;
  *       uses: actions/checkout@v4
  * </pre>
  */
-public class C4_MappingListRule implements ICreationRule{
+public class C1_MappingListRule implements ICreationRule{
     @Override
     public boolean appliesTo(Object value) {
         if(!(value instanceof List<?> list) || list.isEmpty())

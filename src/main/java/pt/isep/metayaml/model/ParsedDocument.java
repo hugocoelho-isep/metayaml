@@ -1,6 +1,8 @@
 package pt.isep.metayaml.model;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public record ParsedDocument (String dslName, Path sourcePath, Map<String, Object> content){
@@ -14,7 +16,9 @@ public record ParsedDocument (String dslName, Path sourcePath, Map<String, Objec
         if (content == null) {
             throw new IllegalArgumentException("Content must not be null");
         }
-        content = Map.copyOf(content); // immutable
+        // Preserve YAML insertion order (Map.copyOf randomises iteration order per JVM run,
+        // which made class emission order — and thus the generated .ecore/.puml — non-deterministic).
+        content = Collections.unmodifiableMap(new LinkedHashMap<>(content));
     }
 
     public String fileName() {

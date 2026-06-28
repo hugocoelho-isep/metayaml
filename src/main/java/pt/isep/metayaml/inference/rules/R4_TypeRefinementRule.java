@@ -6,12 +6,12 @@ import pt.isep.metayaml.model.MetaAttribute;
 import pt.isep.metayaml.model.MetaClass;
 
 /**
- * R2 — Type refinement rule.
+ * R4 — Type refinement rule.
  *
  * <p>During creation, SnakeYAML parses scalars with their native types
- * (Boolean, Integer, etc.), so type widening is handled in C2. However,
+ * (Boolean, Integer, etc.), so type widening is handled in C4. However,
  * when an attribute is seen as NULL in one document and a concrete type
- * in another, the type remains NULL. R2 promotes NULL attributes to UNKNOWN
+ * in another, the type remains NULL. R4 promotes NULL attributes to UNKNOWN
  * and resolves any remaining STRING attributes that were widened from
  * more specific types.
  *
@@ -20,7 +20,7 @@ import pt.isep.metayaml.model.MetaClass;
  * {@code update_cache}) is promoted to BOOLEAN if all observed values
  * were boolean-compatible.
  */
-public class R2_TypeRefinementRule implements IRefinementRule{
+public class R4_TypeRefinementRule implements IRefinementRule{
     @Override
     public void apply(InferredMetamodel metamodel) {
         for (MetaClass metaClass : metamodel.getClasses()) {

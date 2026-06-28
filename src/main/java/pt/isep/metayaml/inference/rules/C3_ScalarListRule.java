@@ -26,7 +26,7 @@ public class C3_ScalarListRule implements ICreationRule{
         if(!(value instanceof List<?> list) || list.isEmpty())
             return false;
 
-        return list.stream().allMatch(C2_ScalarRule::isScalar);
+        return list.stream().allMatch(C4_ScalarRule::isScalar);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class C3_ScalarListRule implements ICreationRule{
         List<?> list = (List<?>) value;
 
         DataType type = list.stream()
-                .map(C2_ScalarRule::inferType)
+                .map(C4_ScalarRule::inferType)
                 .reduce(C3_ScalarListRule::mergeTypes)
                 .orElse(DataType.UNKNOWN);
 

@@ -7,10 +7,9 @@ import pt.isep.metayaml.model.MetaClass;
 import pt.isep.metayaml.model.MetaReference;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
- * C1 — Mapping rule.
+ * C2 — Mapping rule.
  *
  * <p>When a YAML key maps to a nested mapping (object), a new {@link MetaClass}
  * is created (or reused) and a containment {@link MetaReference} is added to
@@ -24,14 +23,16 @@ import java.util.Set;
  *     retries: 5
  * </pre>
  */
-public class C1_MappingRule implements ICreationRule {
+public class C2_MappingRule implements ICreationRule {
 
     /**
-     * Class names that must never be treated as named-map-containers,
-     * even if their name looks plural. These represent single flat mappings
-     * in the DSL (e.g. {@code defaults} is one object, not a map of named instances).
+     * Minimum number of distinct child keys (across all documents) for a plural-named
+     * class to count as a named-map container. An open key space of user-defined instance
+     * names (jobs, services, secrets, …) accumulates many distinct keys; a fixed block
+     * keeps one or two recurring ones ({@code defaults → run},
+     * {@code resources → limits, reservations}) and is therefore treated as a flat object.
      */
-    private static final Set<String> NON_CONTAINER_CLASS_NAMES = Set.of("Defaults");
+    private static final int CONTAINER_KEY_THRESHOLD = 3;
 
     @Override
     public boolean appliesTo(Object value) {
@@ -47,7 +48,8 @@ public class C1_MappingRule implements ICreationRule {
         String refName;
         boolean many;
 
-        if (isNamedMapContainer(owner)) {
+        boolean namedMapContainer = isNamedMapContainer(owner, engine);
+        if (namedMapContainer) {
             // e.g. Jobs.build / Jobs.lint / Jobs.release → all become Job
             String singularOwner = singular(owner.getName());
             targetName = capitalize(singularOwner);
@@ -62,7 +64,7 @@ public class C1_MappingRule implements ICreationRule {
         MetaClass target = metamodel.getOrCreateClass(targetName);
         target.incrementOccurrences();
 
-        if (isNamedMapContainer(owner)) {
+        if (namedMapContainer) {
             target.findAttribute("id").ifPresentOrElse(
                     MetaAttribute::incrementOccurrences,
                     () -> target.addAttribute(new MetaAttribute("id", DataType.STRING, false, false))
@@ -81,23 +83,29 @@ public class C1_MappingRule implements ICreationRule {
      * Returns true when the owner is a plural container whose children are
      * named instances of a common type (e.g. {@code Jobs}, {@code Services}).
      *
-     * <p>Three conditions must all hold:
+     * <p>Four conditions must all hold:
      * <ol>
      *   <li>The owner has no scalar attributes — its entries are all sub-mappings.</li>
      *   <li>Singularising the owner name produces a different string — it is plural.</li>
      *   <li>The owner name has no internal uppercase letters — it is a simple word,
      *       not a compound like {@code GithubActions}.</li>
+     *   <li>Across the corpus it has at least {@value #CONTAINER_KEY_THRESHOLD} distinct
+     *       child keys — an open space of user-defined instance names, not a fixed block
+     *       like {@code defaults → run} or {@code resources → limits/reservations}.</li>
      * </ol>
+     *
+     * <p>The last condition replaced a hardcoded {@code NON_CONTAINER_CLASS_NAMES} set
+     * (it listed {@code Defaults}); it is inferred from {@link IRuleEngine#distinctChildKeys}.
      */
-    private boolean isNamedMapContainer(MetaClass owner) {
-        if (NON_CONTAINER_CLASS_NAMES.contains(owner.getName())) return false;
+    private boolean isNamedMapContainer(MetaClass owner, IRuleEngine engine) {
         if (!owner.getAttributes().isEmpty()) return false;
         String name = owner.getName();
         // reject compound names like GithubActions (uppercase after first char)
         for (int i = 1; i < name.length(); i++) {
             if (Character.isUpperCase(name.charAt(i))) return false;
         }
-        return !singular(name).equals(name);
+        if (singular(name).equals(name)) return false; // not plural
+        return engine.distinctChildKeys(name) >= CONTAINER_KEY_THRESHOLD;
     }
 
     private String capitalize(String name) {

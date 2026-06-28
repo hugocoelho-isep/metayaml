@@ -3,7 +3,7 @@ package pt.isep.metayaml.inference.rules;
 import pt.isep.metayaml.model.InferredMetamodel;
 
 /**
- * Contract for a refinement rule (R1–R3) in the Cánovas Izquierdo & Cabot algorithm.
+ * Contract for a refinement rule (R1–R9) in the Cánovas Izquierdo & Cabot algorithm.
  *
  * <p>Refinement rules operate on a fully-constructed {@link InferredMetamodel}
  * and improve its quality by adjusting optionality, types, and class structure.

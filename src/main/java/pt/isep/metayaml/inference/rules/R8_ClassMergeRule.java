@@ -8,7 +8,7 @@ import java.util.*;
 
 
 /**
- * R3 — Class merge rule.
+ * R8 — Class merge rule.
  *
  * <p>Two classes are candidates for merging if they share the same set of
  * attribute names and reference names (structural equivalence). When merged,
@@ -21,7 +21,7 @@ import java.util.*;
  *
  * <p>Features present in only one of the merged classes are marked optional.
  */
-public class R3_ClassMergeRule implements IRefinementRule {
+public class R8_ClassMergeRule implements IRefinementRule {
     @Override
     public void apply(InferredMetamodel metamodel) {
         boolean merged = true;
@@ -119,7 +119,7 @@ public class R3_ClassMergeRule implements IRefinementRule {
 
         metamodel.removeClass(absorbed);
 
-        System.out.printf("[INFO] R3: merged '%s' into '%s'%n", absorbed.getName(), survivor.getName());
+        System.out.printf("[INFO] R8: merged '%s' into '%s'%n", absorbed.getName(), survivor.getName());
     }
 
     private Set<String> attributeNames(MetaClass metaClass){

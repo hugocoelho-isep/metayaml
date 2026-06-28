@@ -1,0 +1,27 @@
+name: Reusable build workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: string
+      image-tag:
+        description: "Image tag to build"
+        required: false
+        default: latest
+        type: string
+    secrets:
+      registry-token:
+        required: true
+      deploy-key:
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: echo "Building ${{ inputs.image-tag }} for ${{ inputs.environment }}"

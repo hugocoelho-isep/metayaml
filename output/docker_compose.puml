@@ -53,14 +53,14 @@ class Network{
 abstract class Volume{
 }
 
-class Resource{
-  + id : STRING [1..1]
-  + memory : STRING [1..1]
+class Deploy{
 }
 
-class Secret{
-  + id : STRING [1..1]
-  + file : STRING [1..1]
+class Resources{
+}
+
+class Limits{
+  + memory : STRING [1..1]
 }
 
 abstract class Depends_on{
@@ -68,6 +68,14 @@ abstract class Depends_on{
 
 class Db{
   + condition : STRING [1..1]
+}
+
+class Secret{
+  + id : STRING [1..1]
+  + file : STRING [1..1]
+}
+
+class Ipam{
 }
 
 class Config{
@@ -126,11 +134,14 @@ DockerCompose *--> "0..*" Volume : volumes
 DockerCompose *--> "0..*" Secret : secrets
 Service *--> "0..1" Build : build
 Service *--> "0..1" Healthcheck : healthcheck
-Service *--> "0..*" Resource : deploy
+Service *--> "0..1" Deploy : deploy
 Service *--> "0..1" Depends_on : depends_on
 Service *--> "0..*" Volume : volumes
 Service *--> "0..1" Networks : networks
-Network *--> "0..*" Config : ipam
+Network *--> "0..1" Ipam : ipam
+Deploy *--> "1..1" Resources : resources
+Resources *--> "1..1" Limits : limits
+Ipam *--> "1..*" Config : config
 NetworksObject *--> "1..*" Network : network
 Depends_onObject *--> "1..1" Db : db
 

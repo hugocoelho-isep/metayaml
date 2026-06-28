@@ -8,7 +8,7 @@ import pt.isep.metayaml.model.MetaClass;
 import java.util.Set;
 
 /**
- * C2 — Scalar rule.
+ * C4 — Scalar rule.
  *
  * <p>When a YAML key maps to a scalar value (string, integer, float, boolean,
  * or null), a {@link MetaAttribute} is added to the owner class.
@@ -20,7 +20,7 @@ import java.util.Set;
  *   enabled: true         → MetaAttribute(name="enabled", type=BOOLEAN)
  * </pre>
  */
-public class C2_ScalarRule implements ICreationRule {
+public class C4_ScalarRule implements ICreationRule {
 
     private static final Set<String> BOOLEAN_STRINGS = Set.of("true", "false", "yes", "no");
 

@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * R — Shared class optional rule.
+ * R3 — Shared class optional rule.
  *
  * <p>A class referenced by two or more distinct parent classes is a
  * "shared" or "utility" class (e.g. {@code Env}, {@code With},
@@ -23,11 +23,11 @@ import java.util.Map;
  *
  * <p>Example — {@code Env} is referenced by {@code GithubActions},
  * {@code Job}, {@code Step} and {@code Service}. Even if all sampled
- * services happened to declare {@code env}, R1 would have marked
+ * services happened to declare {@code env}, R2 would have marked
  * {@code Service.env} as mandatory {@code [1..1]}. This rule corrects
  * that to {@code [0..1]}.
  */
-public class R_SharedClassOptionalRule implements IRefinementRule {
+public class R3_SharedClassOptionalRule implements IRefinementRule {
 
     private static final int MIN_PARENTS = 2;
 
@@ -39,7 +39,7 @@ public class R_SharedClassOptionalRule implements IRefinementRule {
             for (MetaReference ref : cls.getReferences()) {
                 if (!ref.isOptional() && parentCount.getOrDefault(ref.getTarget(), 0) >= MIN_PARENTS) {
                     ref.setOptional(true);
-                    System.out.printf("[INFO] R_Shared: '%s.%s' marked optional (shared by %d classes)%n",
+                    System.out.printf("[INFO] R3_Shared: '%s.%s' marked optional (shared by %d classes)%n",
                             cls.getName(), ref.getName(), parentCount.get(ref.getTarget()));
                 }
             }

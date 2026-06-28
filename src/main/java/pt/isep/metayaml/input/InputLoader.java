@@ -27,7 +27,7 @@ public class InputLoader {
      * {@code on: [push, pull_request]} in one file and
      * {@code on: { push: { ... } }} in another — the difference is reconciled later
      * by the inference engine's general polymorphism rule
-     * ({@code R_PolymorphicFeatureRule}), which builds an abstract supertype with a
+     * ({@code R1_PolymorphicFeatureRule}), which builds an abstract supertype with a
      * {@code …Value} (the list/scalar shape) and a {@code …Object} (the mapping
      * shape) subtype. This keeps the loader DSL-agnostic: no key-specific
      * assumptions (such as "a list of names is shorthand for a map") are baked in.

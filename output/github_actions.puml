@@ -28,8 +28,8 @@ class Job{
   + needs : STRING [0..*]
   + if : STRING [0..1]
   + uses : STRING [0..1]
-  + with : Map<String, String> [0..1]
   + env : Map<String, String> [0..1]
+  + with : Map<String, String> [0..1]
   + outputs : Map<String, String> [0..1]
 }
 
@@ -43,8 +43,8 @@ class Step{
   + shell : STRING [0..1]
   + continue_on_error : BOOLEAN [0..1]
   + timeout_minutes : INTEGER [0..1]
-  + with : Map<String, String> [0..1]
   + env : Map<String, String> [0..1]
+  + with : Map<String, String> [0..1]
 }
 
 abstract class Permissions{
@@ -57,12 +57,12 @@ class Schedule{
 class Workflow_dispatch{
 }
 
-abstract class Environment{
-}
-
 class Concurrency{
   + group : STRING [1..1]
   + cancel_in_progress : BOOLEAN [1..1]
+}
+
+abstract class Environment{
 }
 
 class Strategy{
@@ -104,23 +104,23 @@ class Release{
   + types : STRING [1..*]
 }
 
+class Service{
+  + id : STRING [1..1]
+  + image : STRING [1..1]
+  + ports : STRING [1..*]
+  + env : Map<String, String> [0..1]
+}
+
 class Input{
   + id : STRING [1..1]
   + description : STRING [1..1]
-  + default : STRING [1..1]
+  + default : STRING [0..1]
   + required : BOOLEAN [1..1]
   + type : STRING [1..1]
 }
 
 class Merge_group{
   + branches : STRING [1..*]
-}
-
-class Service{
-  + id : STRING [1..1]
-  + image : STRING [1..1]
-  + ports : STRING [1..*]
-  + env : Map<String, String> [0..1]
 }
 
 class Issues{
@@ -197,6 +197,7 @@ Job *--> "0..1" Defaults : defaults
 Workflow_dispatch *--> "0..*" Input : inputs
 Strategy *--> "0..1" Matrix : matrix
 Workflow_call *--> "1..*" Secret : secrets
+Workflow_call *--> "0..*" Input : inputs
 Defaults *--> "1..1" Run : run
 OnObject *--> "0..1" Push : push
 OnObject *--> "0..1" Pull_request : pull_request

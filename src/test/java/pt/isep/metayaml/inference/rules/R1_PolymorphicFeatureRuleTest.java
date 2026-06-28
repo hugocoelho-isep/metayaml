@@ -10,13 +10,13 @@ import pt.isep.metayaml.model.MetaReference;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for {@link R_PolymorphicFeatureRule}, which generalises a feature that
+ * Tests for {@link R1_PolymorphicFeatureRule}, which generalises a feature that
  * appears as both a scalar and a nested object into an abstract supertype with
  * two concrete subtypes (the GitHub Actions {@code environment} case).
  */
-class R_PolymorphicFeatureRuleTest {
+class R1_PolymorphicFeatureRuleTest {
 
-    private final R_PolymorphicFeatureRule rule = new R_PolymorphicFeatureRule();
+    private final R1_PolymorphicFeatureRule rule = new R1_PolymorphicFeatureRule();
 
     @Test
     void scalarAndObjectFormBecomeAbstractWithTwoSubtypes() {
@@ -111,7 +111,7 @@ class R_PolymorphicFeatureRuleTest {
 
         rule.apply(mm);
 
-        // no union is built: the conflict is left for R_EmptyClassRemovalRule to collapse
+        // no union is built: the conflict is left for R5_EmptyClassRemovalRule to collapse
         assertFalse(repository.isAbstract());
         assertTrue(mm.findClass("RepositoryObject").isEmpty());
         assertTrue(mm.findClass("RepositoryValue").isEmpty());
